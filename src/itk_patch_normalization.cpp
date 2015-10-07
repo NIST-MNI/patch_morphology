@@ -195,6 +195,7 @@ void show_usage ( const char *name )
 {
   std::cerr
       << "Usage: "<<name<<"  <input> <output normalized>" << std::endl
+      << " " << std::endl
       << "\t--train <training_data> use this samples list" << std::endl
       << "\t--train2 <training_data2> use this samples list" << std::endl
       << "\t--verbose be verbose" << std::endl

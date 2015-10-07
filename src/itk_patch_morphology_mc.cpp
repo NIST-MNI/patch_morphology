@@ -285,6 +285,9 @@ bool ssd_compare(const ImagePairType &i,const ImagePairType &j)
 void show_usage ( const char *name )
 {
   std::cerr
+      << "Multi-channel patch based segmentation tool" << std::endl
+      << "Reference: \"Patch-based segmentation using expert priors: Application to hippocampus and ventricle segmentation\"" << std::endl
+      << "\thttp://dx.doi.org/10.1016/j.neuroimage.2010.09.018" << std::endl << std::endl
       << "Usage: "<<name<<"  <input1> [input2] .. [inputN] " << std::endl
       << "\t--train <training_data> use this samples list" << std::endl
       << "\t--verbose be verbose" << std::endl
