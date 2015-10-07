@@ -135,9 +135,9 @@ void show_usage (const char *name)
 {
   std::cerr 
     << "Patch-based denoising tool" << std::endl
-    << "Reference: \"Fast Non Local Means Denoising for 3D MR Images\" " << std::endl
+    << "Reference: Fast Non Local Means Denoising for 3D MR Images" << std::endl
     << "\thttp://dx.doi.org/10.1007/11866763_5" <<std::endl
-    << "\t\"Adaptive non-local means denoising of MR images with spatially varying noise levels\" " << std::endl
+    << "\tAdaptive non-local means denoising of MR images with spatially varying noise levels" << std::endl
     << "\thttp://dx.doi.org/10.1002/jmri.22003" << std::endl << std::endl
     << "Usage: " << name << " <input_image.mnc> <output_image.mnc> " << std::endl
     << "--noise <f> provide noise levels for filter that need it "<<std::endl
