@@ -7,15 +7,12 @@ if(COMMAND cmake_policy)
  cmake_policy(SET CMP0003 OLD)
 endif(COMMAND cmake_policy)
 
-
-
-
 IF(NOT MINC_TOOLKIT_BUILD)
-  SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
-  
   FIND_PACKAGE(ITK REQUIRED)
   
+  OPTION(PATCH_MORPHOLOGY_BUILD_LEGACY    "Build legacy program volume_patchs, requires LIBMINC" OFF)
   
+
 ENDIF(NOT MINC_TOOLKIT_BUILD)
 
 
@@ -25,3 +22,7 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
 
 add_subdirectory(src)
+
+IF(PATCH_MORPHOLOGY_BUILD_LEGACY)
+add_subdirectory(legacy)
+ENDIF(PATCH_MORPHOLOGY_BUILD_LEGACY)
