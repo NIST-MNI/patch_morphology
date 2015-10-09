@@ -1,6 +1,7 @@
 INSTALL(PROGRAMS 
         hcag_segmentation_pipeline.pl
         patch_segmentation_pipeline.pl
+        snipe_grading_pipeline.pl
         DESTINATION bin )
 
 IF(PATCH_MORPHOLOGY_BUILD_LEGACY)
