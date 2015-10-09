@@ -29,9 +29,10 @@
                      
 ## Building:
 * Building require ITK version 4.XX and cmake version 2.6 or later
+* legacy tool ( volume_patches ) requires LIBMINC ( https://github.com/BIC-MNI/libminc )
 
 ## Usage (concise):
-General notes, these programs were originally designed to be used with MINC files, but should work with any file format supported by ITK version 4
+These programs were originally designed to be used with MINC files, but should work with any file format supported by ITK version 4
 Most tools have an optional paramter called search radius - which specifies how non-local the search should be (in voxels)
 and patch radius - the radius of the local patch used to extract features.
 
@@ -48,6 +49,8 @@ itk_minc_nonlocal_filter input.mnc output.mnc --search $search_radius --patch $p
 ```
 
 ### Segmentation
+All segmentation tools and scripts require library of labelled samples, which should be obtained **independently**. 
+
 Segmetnation tool require library of presegmented examples ```$train```, number of classes including background ```$classes``` and optionally search radius and patch radius
 Training examples are referenced in a comma separated file in the format: ```<image.mnc>,<labels.mnc>```
 
@@ -63,6 +66,7 @@ Several high level scripts are included in ```scripts``` directory:
 
 
 ### Grading
+All grading tools and scripts require library of labelled samples, which should be obtained **independently**. 
 Similar to segmetnation tool, grading require library of presegmented examples ```$train``` and optionally search radius and patch radius
 Training examples are referenced in a comma separated file in the format: ```<image.mnc>,<labels.mnc>,<grading>```
 Two training libraries can be provided , which are both loaded (and optionally each is used independently for pre-selection)
