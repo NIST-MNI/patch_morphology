@@ -23,7 +23,7 @@ namespace itk {
 template<class TInputImage, class TOutputImage, class TSearch, class TPatch,class TDistance,class TWeight,class TPreselectionFilter>
 AdaptativeNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, TWeight,TPreselectionFilter>
 ::AdaptativeNonLocalFilter():
- m_SearchKernel(),m_PatchKernel(),m_OutputMeanWeight(false),m_Beta(1.0),m_Regularize(0.0)
+m_SearchKernel(),m_PatchKernel(),m_OutputMeanWeight(false),m_Beta(1.0),m_Regularize(0.0)
 {
   m_DefaultBoundaryCondition.SetConstant( itk::NumericTraits<PixelType>::Zero );
   m_BoundaryCondition = &m_DefaultBoundaryCondition;
@@ -44,10 +44,10 @@ AdaptativeNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, 
     const_cast< TInputImage * >( this->GetInput(0) );
   
   if ( !inputPtr )
-	{
+  {
     return;
-	}
-	
+  }
+  
   // get a copy of the input requested region (should equal the output
   // requested region)
 
@@ -59,10 +59,10 @@ AdaptativeNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, 
 
   // crop the input requested region at the input's largest possible region
   if ( inputRequestedRegion.Crop(inputPtr->GetLargestPossibleRegion()) )
-	{
+  {
     inputPtr->SetRequestedRegion( inputRequestedRegion );
     return;
-	} else {
+  } else {
     // Couldn't crop the region (requested region is outside the largest
     // possible region).  Throw an exception.
 
@@ -75,8 +75,8 @@ AdaptativeNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, 
     e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
     e.SetDataObject(inputPtr);
     throw e;
-	}
-	
+  }
+  
 }
 
 
@@ -170,14 +170,14 @@ void AdaptativeNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDista
 ::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
-	
+  
   os << indent << "Search Kernel: " << m_SearchKernel << std::endl;
   os << indent << "Patch Kernel: "  << m_PatchKernel  << std::endl;
   os << indent << "Boundary condition: " << typeid( *m_BoundaryCondition ).name() << std::endl;
   os << indent << "Preselection filter: " << typeid( m_PreselectionFilter ).name() << std::endl;
   os << indent << "Beta: " << m_Beta << std::endl;
   os << indent << "Regularize: " << m_Regularize << std::endl;
-	
+  
 }
 
 }// end namespace itk

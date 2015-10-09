@@ -18,23 +18,23 @@
 
 namespace itk {
 
-	
+  
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch, class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>
-	std::ostream & operator<<(std::ostream &os, const typename SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch, TPatch,SampleProcess, TDistance,TPreselectionFilter,TRealType>::SegmentationLibraryType &s)
-	{
-		os<< " [ SegmentationLibraryType , size="<<s.size()<<" ]";
-	}
-	
+  std::ostream & operator<<(std::ostream &os, const typename SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch, TPatch,SampleProcess, TDistance,TPreselectionFilter,TRealType>::SegmentationLibraryType &s)
+  {
+    os<< " [ SegmentationLibraryType , size="<<s.size()<<" ]";
+  }
+  
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch, class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>
 SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch, TPatch, SampleProcess,TDistance,TPreselectionFilter,TRealType>
 ::SegmentationNonLocalFilter():
- m_SearchKernel(),m_PatchKernel()
+m_SearchKernel(),m_PatchKernel()
 {
   /*m_DefaultBoundaryCondition.SetConstant( itk::NumericTraits<PixelType>::Zero );*/
   m_BoundaryCondition = &m_DefaultBoundaryCondition;
-	
-	m_DefaultLabelBoundaryCondition.SetConstant( itk::NumericTraits<LabelPixelType>::Zero );
-	m_LabelBoundaryCondition=&m_DefaultLabelBoundaryCondition;
+  
+  m_DefaultLabelBoundaryCondition.SetConstant( itk::NumericTraits<LabelPixelType>::Zero );
+  m_LabelBoundaryCondition=&m_DefaultLabelBoundaryCondition;
   
   m_ConfidenceThreshold=0.5; //Run everywhere where confidence <0.5
   m_NonConfidentVoxels=0;
@@ -53,9 +53,9 @@ SegmentationNonLocalFilter<TFeatureImage, TLabelImage, TOutputImage, TSearch, TP
     const_cast< TFeatureImage * >( this->GetInput() );
   
   if ( !inputPtr )
-	{
+  {
     return;
-	}
+  }
 
   // get a copy of the input requested region (should equal the output
   // requested region)
@@ -68,10 +68,10 @@ SegmentationNonLocalFilter<TFeatureImage, TLabelImage, TOutputImage, TSearch, TP
 
   // crop the input requested region at the input's largest possible region
   if ( inputRequestedRegion.Crop(inputPtr->GetLargestPossibleRegion()) )
-	{
+  {
     inputPtr->SetRequestedRegion( inputRequestedRegion );
     return;
-	} else {
+  } else {
     // Couldn't crop the region (requested region is outside the largest
     // possible region).  Throw an exception.
 
@@ -84,7 +84,7 @@ SegmentationNonLocalFilter<TFeatureImage, TLabelImage, TOutputImage, TSearch, TP
     e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
     e.SetDataObject(inputPtr);
     throw e;
-	}
+  }
 }
 
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch,class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>
@@ -221,44 +221,44 @@ SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch, TPa
 
 #if (ITK_VERSION_MAJOR==3)
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch,
-         class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>
+        class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>
 void
 SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch, 
-                           TPatch,SampleProcess, TDistance,TPreselectionFilter,TRealType>
+                          TPatch,SampleProcess, TDistance,TPreselectionFilter,TRealType>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                       int threadId) 
+                      int threadId) 
 #else
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch,
-         class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>
+        class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>
 void
 SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch, 
-                           TPatch,SampleProcess, TDistance,TPreselectionFilter,TRealType>
+                          TPatch,SampleProcess, TDistance,TPreselectionFilter,TRealType>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                       itk::ThreadIdType threadId) 
+                      itk::ThreadIdType threadId) 
 #endif
 {
   // Neighborhood iterators
   NeighborhoodIteratorType search_iter;
-	
-	//patch Neighborhood iterators
-	NeighborhoodIteratorType patch_iter;
+  
+  //patch Neighborhood iterators
+  NeighborhoodIteratorType patch_iter;
   
   //probability vector
   std::vector<double> prob(m_Process->GetLabelCount(),0.0);
 
-	
+  
 
   // Find the boundary "faces"
   typename itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<FeatureImageType>::FaceListType faceList;
-	
+  
   itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<FeatureImageType> fC;
-	
+  
   faceList = fC(this->GetInput(0), outputRegionForThread, m_SearchKernel.GetRadius());
 
   typename itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<FeatureImageType>::FaceListType::iterator fit;
 
   itk::ImageRegionIterator<TOutputImage> o_iter;
- 	itk::ImageRegionConstIterator<RoiImageType> roi_iterator;
+  itk::ImageRegionConstIterator<RoiImageType> roi_iterator;
   
   itk::ImageRegionIterator<FloatImageType> conf_iter;
   itk::ImageRegionIterator<FloatImageType> sdist_iter;
@@ -278,38 +278,38 @@ SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch,
   
   //TODO: make a clone here ?
   PreselectionFilterPointerType preselection_filter=m_PreselectionFilter; 
-	
-	size_t library_size=m_SegmentationLibrary.size();
-	
-	std::vector<NeighborhoodIteratorType> patch_iterators(library_size);
-	std::vector<LabelNeighborhoodIteratorType> search_iterators(library_size);
-	
-	SegmentationLabelDistance label_distance;
-	
-	label_distance.reserve(library_size*m_SearchKernel.Size());
+  
+  size_t library_size=m_SegmentationLibrary.size();
+  
+  std::vector<NeighborhoodIteratorType> patch_iterators(library_size);
+  std::vector<LabelNeighborhoodIteratorType> search_iterators(library_size);
+  
+  SegmentationLabelDistance label_distance;
+  
+  label_distance.reserve(library_size*m_SearchKernel.Size());
   
   for (fit = faceList.begin() ; fit != faceList.end(); ++fit)
-	{ 
+  { 
     search_iter = NeighborhoodIteratorType(m_SearchKernel.GetRadius(),
                                       this->GetInput(0), *fit);
-		
-		patch_iter = NeighborhoodIteratorType(m_PatchKernel.GetRadius(),
+    
+    patch_iter = NeighborhoodIteratorType(m_PatchKernel.GetRadius(),
                                       this->GetInput(0), *fit);
-		
-   
-		for(size_t sample=0;sample<library_size;sample++)
-		{
-			patch_iterators[sample] = NeighborhoodIteratorType(m_PatchKernel.GetRadius(),
+    
+  
+    for(size_t sample=0;sample<library_size;sample++)
+    {
+      patch_iterators[sample] = NeighborhoodIteratorType(m_PatchKernel.GetRadius(),
                                       m_SegmentationLibrary[sample].feature, *fit);
-			
-			patch_iterators[sample].OverrideBoundaryCondition(m_BoundaryCondition);
-			
-			search_iterators[sample] = LabelNeighborhoodIteratorType(m_SearchKernel.GetRadius(),
+      
+      patch_iterators[sample].OverrideBoundaryCondition(m_BoundaryCondition);
+      
+      search_iterators[sample] = LabelNeighborhoodIteratorType(m_SearchKernel.GetRadius(),
                                       m_SegmentationLibrary[sample].label, *fit);
-			
-			search_iterators[sample].OverrideBoundaryCondition(m_LabelBoundaryCondition);
-			search_iterators[sample].GoToBegin();
-		}
+      
+      search_iterators[sample].OverrideBoundaryCondition(m_LabelBoundaryCondition);
+      search_iterators[sample].GoToBegin();
+    }
     
     // primary output
     o_iter    = itk::ImageRegionIterator<OutputImageType>(this->GetOutput(), *fit);
@@ -404,7 +404,7 @@ SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch,
               continue;
 
             label_distance.push_back( 
-             LabelDistance<LabelPixelType,ImageDimension>(
+            LabelDistance<LabelPixelType,ImageDimension>(
                 search_iterators[sample].GetPixel(i),
                 m_Distance->distance(patch_iter, patch_iterators[sample], patchKernelBegin, patchKernelEnd),
                 sample,
@@ -472,11 +472,11 @@ void SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch
 ::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
-	
+  
   os << indent << "Search Kernel: " << m_SearchKernel << std::endl;
   os << indent << "Patch Kernel: "  << m_PatchKernel  << std::endl;
   os << indent << "Boundary condition: " << typeid( *m_BoundaryCondition ).name() << std::endl;
-	
+  
 }
 
 }// end namespace itk

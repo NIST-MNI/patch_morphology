@@ -160,6 +160,7 @@ namespace itk
 }
 
 #endif //__itkHelpers_h__
+
 // kate: space-indent on; indent-width 2; indent-mode C++;replace-tabs on;show-tabs on;tab-width 2;hl c++
 
 

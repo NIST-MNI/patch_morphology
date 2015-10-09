@@ -27,12 +27,12 @@ template<class TInputImage, class TOutputImage, class TKernel>
 typename LocalSDFilter<TInputImage, TOutputImage, TKernel>::PixelType
 LocalSDFilter<TInputImage, TOutputImage, TKernel>
 ::Evaluate(const NeighborhoodIteratorType &nit,
-           const KernelIteratorType kernelBegin,
-           const KernelIteratorType kernelEnd)
+          const KernelIteratorType kernelBegin,
+          const KernelIteratorType kernelEnd)
 {
   unsigned int i;
   double sum=0.0,sum2=0.0;
-	unsigned int cnt=0;
+  unsigned int cnt=0;
 
   KernelIteratorType kernel_it;
 

@@ -22,7 +22,7 @@ namespace itk {
 template<class TInputImage, class TOutputImage, class TSearch, class TPatch,class TDistance,class TWeight,class TPreselectionFilter>
 NoiseMedianDistanceNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, TWeight,TPreselectionFilter>
 ::NoiseMedianDistanceNonLocalFilter():
- m_SearchKernel(),m_PatchKernel()
+m_SearchKernel(),m_PatchKernel()
 {
   m_DefaultBoundaryCondition.SetConstant( itk::NumericTraits<PixelType>::Zero );
   m_BoundaryCondition = &m_DefaultBoundaryCondition;
@@ -109,7 +109,7 @@ NoiseMedianDistanceNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TD
     median_dist = MedianDistanceNonLocalFilter<TInputImage,TOutputImage,TPatch,TSearch,TDistance>::New();
 
     
- 
+
   mean->SetInput( this->GetInput());
   mean->SetKernel( this->GetPatchKernel());
   

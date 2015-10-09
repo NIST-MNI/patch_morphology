@@ -61,14 +61,14 @@ namespace itk
 
 
 template<class TFeatureImage, 
-         class TLabelImage, 
-         class TOutputImage, 
-         class TSearch, 
-         class TPatch,
-         class TSampleProcess,
-         class TDistance=L2PatchDistance<TFeatureImage,TPatch>,
-         class TPreselectionFilter=NOOPSegmentationPreselection<3>,
-         class TRealType=float>
+        class TLabelImage, 
+        class TOutputImage, 
+        class TSearch, 
+        class TPatch,
+        class TSampleProcess,
+        class TDistance=L2PatchDistance<TFeatureImage,TPatch>,
+        class TPreselectionFilter=NOOPSegmentationPreselection<3>,
+        class TRealType=float>
 class  SegmentationNonLocalFilter : 
     public itk::ImageToImageFilter<TFeatureImage, TOutputImage>
   {
@@ -225,7 +225,7 @@ class  SegmentationNonLocalFilter :
     /** get preselection filter */
     itkGetMacro(PreselectionFilter,PreselectionFilterPointerType);
 
-   
+  
     /** get confidence results */
     itkGetMacro(Confidence,FloatImagePointerType);
     /** set confidence results */

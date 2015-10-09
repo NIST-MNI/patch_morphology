@@ -30,58 +30,58 @@ template<class TInputImage, class TOutputImage, class TSearch, class TPatch,clas
 typename ClassicalNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, TWeight,TPreselectionFilter>::PixelType
 ClassicalNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, TWeight,TPreselectionFilter>
 ::Evaluate(const NeighborhoodIteratorType &searchIt,
-					 const NeighborhoodIteratorType &patchIt1,
-					 NeighborhoodIteratorType &patchIt2,
-					 const SearchKernelIteratorType searchKernelBegin,
-					 const SearchKernelIteratorType searchKernelEnd,
-					 const PatchKernelIteratorType patchKernelBegin,
-					 const PatchKernelIteratorType patchKernelEnd,
-					 PreselectionFilterPointerType flt
-					)
+          const NeighborhoodIteratorType &patchIt1,
+          NeighborhoodIteratorType &patchIt2,
+          const SearchKernelIteratorType searchKernelBegin,
+          const SearchKernelIteratorType searchKernelEnd,
+          const PatchKernelIteratorType patchKernelBegin,
+          const PatchKernelIteratorType patchKernelEnd,
+          PreselectionFilterPointerType flt
+          )
 {
   ::size_t i;
   SearchKernelIteratorType kernel_it;
-	::size_t center = (::size_t) (searchIt.Size() / 2); // get offset of center pixel
+  ::size_t center = (::size_t) (searchIt.Size() / 2); // get offset of center pixel
 
-	double total_weight=0.0;
-	double total=0.0;
-	double smallest_weight=0.0;
-	
+  double total_weight=0.0;
+  double total=0.0;
+  double smallest_weight=0.0;
+  
   for( i=0, kernel_it=searchKernelBegin; kernel_it<searchKernelEnd; ++kernel_it, ++i )
-	{
+  {
     // if structuring element is positive, use the pixel under that element
     // in the image
     if( *kernel_it > itk::NumericTraits<KernelPixelType>::Zero )
-		{
-			patchIt2.SetLocation(searchIt.GetIndex(i)); //move patch
-			
-			if(!patchIt2.InBounds()) continue;
-			
-			if(!flt->select(patchIt1.GetIndex(),patchIt2.GetIndex())) continue;
+    {
+      patchIt2.SetLocation(searchIt.GetIndex(i)); //move patch
+      
+      if(!patchIt2.InBounds()) continue;
+      
+      if(!flt->select(patchIt1.GetIndex(),patchIt2.GetIndex())) continue;
 
-			//TODO: move distance & weight calculations into templates
-			double distance=0;
-			
-			if(i!=center) 
-				distance=m_Distance->distance(patchIt1,patchIt2,patchKernelBegin,patchKernelEnd);
+      //TODO: move distance & weight calculations into templates
+      double distance=0;
+      
+      if(i!=center) 
+        distance=m_Distance->distance(patchIt1,patchIt2,patchKernelBegin,patchKernelEnd);
 
-			double weight=m_Weight(distance,m_sigma2);
+      double weight=m_Weight(distance,m_sigma2);
       total_weight+=weight;
-			total+=searchIt.GetPixel(i)*weight;
-			if(i!=center && (weight>smallest_weight || smallest_weight==0.0))
-				smallest_weight=weight;
-		}
-	}
-	//add central voxel
-	this->m_Weights->SetPixel(searchIt.GetIndex(center),total_weight);
-	this->m_SmallestWeights->SetPixel(searchIt.GetIndex(center),smallest_weight);
-	
-	if(total_weight==0.0)
-	{
-		total=searchIt.GetPixel(center);
-		total_weight=1.0;
-	}
-	
+      total+=searchIt.GetPixel(i)*weight;
+      if(i!=center && (weight>smallest_weight || smallest_weight==0.0))
+        smallest_weight=weight;
+    }
+  }
+  //add central voxel
+  this->m_Weights->SetPixel(searchIt.GetIndex(center),total_weight);
+  this->m_SmallestWeights->SetPixel(searchIt.GetIndex(center),smallest_weight);
+  
+  if(total_weight==0.0)
+  {
+    total=searchIt.GetPixel(center);
+    total_weight=1.0;
+  }
+  
   if(m_OutputMeanWeight)
     return (PixelType)(total_weight/i);
   else

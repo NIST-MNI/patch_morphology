@@ -29,43 +29,43 @@ template<class TInputImage, class TOutputImage, class TSearch, class TPatch,clas
 typename MinimalDistanceNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance,TPreselectionFilter>::PixelType
 MinimalDistanceNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance,TPreselectionFilter>
 ::Evaluate(const NeighborhoodIteratorType &searchIt,
-					 const NeighborhoodIteratorType &patchIt1,
-					 NeighborhoodIteratorType &patchIt2,
-					 const SearchKernelIteratorType searchKernelBegin,
-					 const SearchKernelIteratorType searchKernelEnd,
-					 const PatchKernelIteratorType patchKernelBegin,
-					 const PatchKernelIteratorType patchKernelEnd,
-					 PreselectionFilterPointerType flt
-					)
+          const NeighborhoodIteratorType &patchIt1,
+          NeighborhoodIteratorType &patchIt2,
+          const SearchKernelIteratorType searchKernelBegin,
+          const SearchKernelIteratorType searchKernelEnd,
+          const PatchKernelIteratorType patchKernelBegin,
+          const PatchKernelIteratorType patchKernelEnd,
+          PreselectionFilterPointerType flt
+          )
 {
   ::size_t i;
   SearchKernelIteratorType kernel_it;
-	::size_t center = (::size_t) (searchIt.Size() / 2); // get offset of center pixel
+  ::size_t center = (::size_t) (searchIt.Size() / 2); // get offset of center pixel
 
-	double smallest_distance=-1.0;
-	
+  double smallest_distance=-1.0;
+  
   for( i=0, kernel_it=searchKernelBegin; kernel_it<searchKernelEnd; ++kernel_it, ++i )
-	{
+  {
     // if structuring element is positive, use the pixel under that element
     // in the image
     if( *kernel_it > itk::NumericTraits<KernelPixelType>::Zero )
-		{
-			patchIt2.SetLocation(searchIt.GetIndex(i)); //move patch
-			
-			if(!patchIt2.InBounds()) continue;
-			//check preselection
-			if(!flt->select(patchIt1.GetIndex(),patchIt2.GetIndex())) continue;
-			
-			if(i==center) 
-				continue;
-			
-			double distance=m_Distance->distance(patchIt1,patchIt2,patchKernelBegin,patchKernelEnd);
-			
-			if(distance<smallest_distance || smallest_distance<0.0) 
-				smallest_distance=distance;
-		}
-	}
-	
+    {
+      patchIt2.SetLocation(searchIt.GetIndex(i)); //move patch
+      
+      if(!patchIt2.InBounds()) continue;
+      //check preselection
+      if(!flt->select(patchIt1.GetIndex(),patchIt2.GetIndex())) continue;
+      
+      if(i==center) 
+        continue;
+      
+      double distance=m_Distance->distance(patchIt1,patchIt2,patchKernelBegin,patchKernelEnd);
+      
+      if(distance<smallest_distance || smallest_distance<0.0) 
+        smallest_distance=distance;
+    }
+  }
+  
   return (PixelType)(smallest_distance>0.0?smallest_distance:0);
 }
 
