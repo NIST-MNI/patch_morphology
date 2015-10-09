@@ -49,7 +49,7 @@ itk_minc_nonlocal_filter input.mnc output.mnc --search $search_radius --patch $p
 ```
 
 ### Segmentation
-All segmentation tools and scripts require library of labelled samples, which should be obtained **independently**. 
+All segmentation tools and scripts require library of labelled samples. 
 
 Segmetnation tool require library of presegmented examples ```$train```, number of classes including background ```$classes``` and optionally search radius and patch radius
 Training examples are referenced in a comma separated file in the format: ```<image.mnc>,<labels.mnc>```
@@ -66,7 +66,8 @@ Several high level scripts are included in ```scripts``` directory:
 
 
 ### Grading
-All grading tools and scripts require library of labelled samples, which should be obtained **independently**. 
+All grading tools and scripts require library of labelled samples. 
+
 Similar to segmetnation tool, grading require library of presegmented examples ```$train``` and optionally search radius and patch radius
 Training examples are referenced in a comma separated file in the format: ```<image.mnc>,<labels.mnc>,<grading>```
 Two training libraries can be provided , which are both loaded (and optionally each is used independently for pre-selection)
