@@ -22,7 +22,8 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
 
 add_subdirectory(src)
+add_subdirectory(scripts)
 
 IF(PATCH_MORPHOLOGY_BUILD_LEGACY)
-add_subdirectory(legacy)
+  add_subdirectory(legacy)
 ENDIF(PATCH_MORPHOLOGY_BUILD_LEGACY)
