@@ -1,27 +1,31 @@
 # ITK patch morphology tools: denoising, segmentation, grading
 
 ## implements methods from:
-  * __denoising__: Pierrick Coupé, Pierre Yger, Christian Barillot 
-                     "Fast Non Local Means Denoising for 3D MR Images" 
-                     http://dx.doi.org/10.1007/11866763_5
-  * __adaptative denoising__: José V. Manjón PhD,Pierrick Coupé PhD, Luis Martí-Bonmatí PhD, D. Louis Collins PhD and Montserrat Robles PhD 
-                     "Adaptive non-local means denoising of MR images with spatially varying noise levels" 
-                     http://dx.doi.org/10.1002/jmri.22003
-  * __segmentation__: Pierrick Coupé, , José V. Manjón, Vladimir Fonov, Jens Pruessner, Montserrat Robles, D. Louis Collins 
-                     "Patch-based segmentation using expert priors: Application to hippocampus and ventricle segmentation" 
-                     http://dx.doi.org/10.1016/j.neuroimage.2010.09.018
+  * __denoising__: 
+      * Pierrick Coupé, Pierre Yger, Christian Barillot 
+        "Fast Non Local Means Denoising for 3D MR Images" 
+        http://dx.doi.org/10.1007/11866763_5
+  * __adaptative denoising__: 
+      * José V. Manjón PhD,Pierrick Coupé PhD, Luis Martí-Bonmatí PhD, D. Louis Collins PhD and Montserrat Robles PhD 
+        "Adaptive non-local means denoising of MR images with spatially varying noise levels" 
+        http://dx.doi.org/10.1002/jmri.22003
+  * __segmentation__: 
+      * Pierrick Coupé, , José V. Manjón, Vladimir Fonov, Jens Pruessner, Montserrat Robles, D. Louis Collins 
+        "Patch-based segmentation using expert priors: Application to hippocampus and ventricle segmentation"
+        http://dx.doi.org/10.1016/j.neuroimage.2010.09.018
+      
+      *  "MICCAI 2012 Workshop on Multi-Atlas Labeling" ISBN-10: 1479126187 entry BIC-IPL and BIC-IPL-HR,
+         https://masi.vuse.vanderbilt.edu/workshop2012/images/c/c8/MICCAI_2012_Workshop_v2.pdf
+      
+      *  Katrin Weier, Vladimir Fonov, Karyne Lavoie, Julien Doyon and D. Louis Collins
+         "Rapid automatic segmentation of the human cerebellum and its lobules (RASCAL) 
+         Implementation and application of the patch-based label-fusion technique with a template library to segment the human cerebellum"
+         http://dx.doi.org/10.1002/hbm.22529
                      
-                     "MICCAI 2012 Workshop on Multi-Atlas Labeling" ISBN-10: 1479126187 entry BIC-IPL and BIC-IPL-HR,
-                     https://masi.vuse.vanderbilt.edu/workshop2012/images/c/c8/MICCAI_2012_Workshop_v2.pdf
-                     
-                     Katrin Weier, Vladimir Fonov, Karyne Lavoie, Julien Doyon and D. Louis Collins
-                     "Rapid automatic segmentation of the human cerebellum and its lobules (RASCAL) 
-                     Implementation and application of the patch-based label-fusion technique with a template library to segment the human cerebellum"
-                     http://dx.doi.org/10.1002/hbm.22529
-                     
-  * __grading__: Pierrick Coupé, Simon F Eskildsen, José V Manjón, Vladimir S Fonov, D Louis Collins, Alzheimer's disease Neuroimaging Initiative 
-                     "Simultaneous segmentation and grading of anatomical structures for patient's classification: application to Alzheimer's disease" 
-                     http://dx.doi.org/10.1016/j.neuroimage.2011.10.080
+  * __grading__: 
+      *  Pierrick Coupé, Simon F Eskildsen, José V Manjón, Vladimir S Fonov, D Louis Collins, Alzheimer's disease Neuroimaging Initiative 
+        "Simultaneous segmentation and grading of anatomical structures for patient's classification: application to Alzheimer's disease" 
+        http://dx.doi.org/10.1016/j.neuroimage.2011.10.080
                      
 ## Building:
 * Building require ITK version 4.XX and cmake version 2.6 or later
@@ -33,13 +37,13 @@ and patch radius - the radius of the local patch used to extract features.
 
 ### Denoising
 Denoising requires specifying noise level (```$sigma```), and optionall search radius ```$search_radius``` and patch radius ```$patch_radius``` 
-```sh
+```
 itk_minc_nonlocal_filter input.mnc output.mnc --noise $sigma --search $search_radius --patch $patch_radius
 ```
 
 ### Adaptative denoising
 Adaptative denoising  have optional parameters: search radius ```$search_radius``` and patch radius ```$patch_radius``` 
-```sh
+```
 itk_minc_nonlocal_filter input.mnc output.mnc --search $search_radius --patch $patch_radius --anlm
 ```
 
