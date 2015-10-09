@@ -52,10 +52,10 @@ itk_patch_morphology input.mnc output_labels.mnc --discrete $classes --search $s
 ```
 
 Several high level scripts are included in ```scripts``` directory:
- * ventricles_segmentation_pipeline.pl - segmentation script for latera ventricle segmentation, uses volume_patches program from legacy directory
- * hcag_segmentation_pipeline.pl - Hippocampus and Amygdala segmetnation script
- * miccai2012_segmentation_minipipe.pl - whole head segmentation pipeline, used in MICCAI 2012 Grand Challenge and Workshop on Multi-Atlas Labeling
- * patch_segmentation_pipeline.pl - generic 
+ * ```ventricles_segmentation_pipeline.pl``` - segmentation script for latera ventricle segmentation, uses volume_patches program from legacy directory
+ * ```hcag_segmentation_pipeline.pl``` - Hippocampus and Amygdala segmentation script
+ * ```miccai2012_segmentation_minipipe.pl``` - whole head segmentation pipeline, used in MICCAI 2012 Grand Challenge and Workshop on Multi-Atlas Labeling
+ * ```patch_segmentation_pipeline.pl``` - generic segmetnation script used in RASCAL paper
 
 
 ### Grading
@@ -66,4 +66,5 @@ Two training libraries can be provided , which are both loaded (and optionally e
 itk_patch_morphology input.mnc --grading output_grading.mnc  --search $search_radius --patch $patch_radius --train $train --train2 $train2
 
 ```
+
 High level script for simultaneous grading and segmentation: ```scripts/snipe_grading_pipeline.pl```
