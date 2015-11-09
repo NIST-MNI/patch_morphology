@@ -3,7 +3,6 @@ IF(NOT MINC_TOOLKIT_BUILD)
 ENDIF(NOT MINC_TOOLKIT_BUILD)
 
 
-
 ADD_EXECUTABLE( volume_patches
                 volume_patches.cpp 
                 utils.cpp  
