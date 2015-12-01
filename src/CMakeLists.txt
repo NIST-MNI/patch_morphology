@@ -33,12 +33,12 @@ TARGET_LINK_LIBRARIES( itk_minc_nonlocal_filter
 # TARGET_LINK_LIBRARIES( itk_levelset_segment  ${ITK_LIBRARIES} )
 # 
  
-ADD_EXECUTABLE(itk_patch_normalization
-    itk_patch_normalization.cpp )
+#ADD_EXECUTABLE(itk_patch_normalization
+#    itk_patch_normalization.cpp )
 
-TARGET_LINK_LIBRARIES( itk_patch_normalization  
-                      ${ITK_LIBRARIES} 
-          )
+#TARGET_LINK_LIBRARIES( itk_patch_normalization  
+#                      ${ITK_LIBRARIES} 
+#          )
 
 
 
