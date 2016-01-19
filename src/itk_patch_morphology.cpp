@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <set>
 #include <getopt.h>
 #include <libgen.h>
 #include <unistd.h>
@@ -280,7 +281,8 @@ void show_usage ( const char *name )
       << "\t--box use Box structuring element (default)" <<std::endl
       << "\t--ball use ball structuring element "<<std::endl
       << "\t--prelabel <labels> prelabel data using this labels, segment only parts which are not labeled yet"<<std::endl
-      << "\t--prob <prefix> store per-label probabilities"<<std::endl;
+      << "\t--prob <prefix> store per-label probabilities"<<std::endl
+      << "\t--groups <n> - modifies behaviour to allow one more column in the training sample (group id) and gurantees balanced sample after pre-selection"<<std::endl;
 }
 
 //! a helper function for image saving
@@ -349,9 +351,6 @@ void ssd_distance(std::vector<ImagePairType>& train_images ,FeatureImageType::Po
     }
     if(cnt>0) dist/=cnt;
     train_images[i].similarity=dist;
-    
-//     if(verbose)
-//       std::cout<<"\tImage "<<i<<" SSD="<<dist<<std::endl;
   }
 }
 
@@ -371,7 +370,6 @@ int main ( int argc,char **argv )
   double beta=0.125;
   int extract_label=0;
   int select_top=0;
-  std::string scaling_f;
   std::string output_dist_f,output_cls_f,output_conf_f,output_adist_f,output_grading_f;
   std::string prob_prefix_f;
   std::string preload_f;
@@ -380,6 +378,7 @@ int main ( int argc,char **argv )
   int discrete=0;
   int max_iterations=50;
   int ball_structuring_element=0;
+  int groups=0;
 
   static struct option long_options[] =
   {
@@ -409,6 +408,7 @@ int main ( int argc,char **argv )
     {"top", required_argument, 0, 'o'},
     {"prelabel", required_argument, 0, 'P'},
     {"prob", required_argument, 0, 'R'},
+    {"groups", required_argument, 0, 'g'},
     
     {"box", no_argument, &ball_structuring_element, 0},
     {"ball", no_argument, &ball_structuring_element, 1},
@@ -462,7 +462,7 @@ int main ( int argc,char **argv )
         output_cls_f=optarg;
         break;
       case 'g':
-        scaling_f=optarg;
+        groups=atoi(optarg);
         break;
       case 'h':
         preselect_threshold=atof(optarg);
@@ -543,7 +543,7 @@ int main ( int argc,char **argv )
     return 1;
   }
   
-  if (!clobber && !output_grading_f.empty() && !access (output_grading_f.c_str(), F_OK))
+  if (!clobber && !output_grading_f.empty() && !access (output_grading_f.c_str(), F_OK) && !groups)
   {
     std::cerr << output_grading_f.c_str () << " Exists!" << std::endl;
     return 1;
@@ -621,98 +621,157 @@ int main ( int argc,char **argv )
     std::vector<ImagePairType> train_images,train_images2;
     std::vector<FeatureImageType::Pointer> trg_images;
     
-    for(size_t i=0;i<tbl.size();i++)
+    if(!groups)
     {
-        
-      if(verbose) 
-        std::cout<<tbl[i][0].c_str()<<"\t"<<std::flush;
-      FeatureImageType::Pointer feature=load_image<FeatureImageType>(tbl[i][0].c_str());
-      
-      if(verbose) 
-        std::cout<<tbl[i][1].c_str()<<"\t"<<std::flush;
-      
-      FeatureImageType::Pointer label=load_image<FeatureImageType>(tbl[i][1].c_str());
-      
-      double grading=1;
-      
-      if(tbl[i].size()>2)
+      for(size_t i=0;i<tbl.size();i++)
       {
-        grading=atof(tbl[i][2].c_str());
-        if(verbose)
-          std::cout<<"\t"<<tbl[i][2].c_str();
+          
+        if(verbose) 
+          std::cout<<tbl[i][0].c_str()<<"\t"<<std::flush;
+        FeatureImageType::Pointer feature=load_image<FeatureImageType>(tbl[i][0].c_str());
+        
+        if(verbose) 
+          std::cout<<tbl[i][1].c_str()<<"\t"<<std::flush;
+        
+        FeatureImageType::Pointer label=load_image<FeatureImageType>(tbl[i][1].c_str());
+        
+        double grading=1;
+        
+        if(tbl[i].size()>2)
+        {
+          grading=atof(tbl[i][2].c_str());
+          if(verbose)
+            std::cout<<"\t"<<tbl[i][2].c_str();
+        }
+        if(verbose) 
+          std::cout<<std::endl;
+          
+        if(extract_label>0 ) //extract label here
+        {
+          FeatureImageType::Pointer label2=extract_label_in_image(label,extract_label);
+          train_images.push_back(ImagePairType(feature,label2,grading));
+        } else 
+          train_images.push_back(ImagePairType(feature,label,grading));
       }
-      if(verbose) 
-        std::cout<<std::endl;
-        
-      if(extract_label>0 ) //extract label here
+      
+      for(size_t i=0;i<tbl2.size();i++)
       {
-        FeatureImageType::Pointer label2=extract_label_in_image(label,extract_label);
-        train_images.push_back(ImagePairType(feature,label2,grading));
-      } else 
-        train_images.push_back(ImagePairType(feature,label,grading));
-    }
-    
-    for(size_t i=0;i<tbl2.size();i++)
-    {
+        if(verbose) 
+          std::cout<<tbl2[i][0].c_str()<<"\t"<<std::flush;
+        FeatureImageType::Pointer feature=load_image<FeatureImageType>(tbl2[i][0].c_str());
         
-      if(verbose) 
-        std::cout<<tbl2[i][0].c_str()<<"\t"<<std::flush;
-      FeatureImageType::Pointer feature=load_image<FeatureImageType>(tbl2[i][0].c_str());
-      
-      if(verbose) 
-        std::cout<<tbl2[i][1].c_str()<<"\t"<<std::flush;
-      
-      FeatureImageType::Pointer label=load_image<FeatureImageType>(tbl2[i][1].c_str());
-      
-      double grading=1;
-      
-      if(tbl2[i].size()>2)
-      {
-        grading=atof(tbl2[i][2].c_str());
-        if(verbose)
-          std::cout<<"\t"<<tbl2[i][2].c_str();
+        if(verbose) 
+          std::cout<<tbl2[i][1].c_str()<<"\t"<<std::flush;
+        
+        FeatureImageType::Pointer label=load_image<FeatureImageType>(tbl2[i][1].c_str());
+        
+        double grading=1.0;
+        
+        if(tbl2[i].size()>2)
+        {
+          grading=atof(tbl2[i][2].c_str());
+          if(verbose)
+            std::cout<<"\t"<<tbl2[i][2].c_str();
+        }
+        if(verbose) 
+          std::cout<<std::endl;
+          
+        if(extract_label>0 ) //extract label here
+        {
+          FeatureImageType::Pointer label2=extract_label_in_image(label,extract_label);
+          train_images2.push_back(ImagePairType(feature,label2,grading));
+        } else 
+          train_images2.push_back(ImagePairType(feature,label,grading));
       }
-      if(verbose) 
-        std::cout<<std::endl;
-        
-      if(extract_label>0 ) //extract label here
+      
+      if(select_top)
       {
-        FeatureImageType::Pointer label2=extract_label_in_image(label,extract_label);
-        train_images2.push_back(ImagePairType(feature,label2,grading));
-      } else 
-        train_images2.push_back(ImagePairType(feature,label,grading));
+        // calculate SSD similarities
+        ssd_distance(train_images ,in_img,roi_in,verbose);
+        ssd_distance(train_images2,in_img,roi_in,verbose);
+        
+        std::sort(train_images.begin(), train_images.end(), ssd_compare);
+        std::sort(train_images2.begin(),train_images2.end(),ssd_compare);
+        
+        if(train_images.size()>select_top)
+          train_images.erase(train_images.begin()+select_top,train_images.end()); 
+        
+        if(train_images2.size()>select_top)
+          train_images2.erase(train_images2.begin()+select_top,train_images2.end()); 
+      }
+      
+      //unite training sets
+      for(size_t i=0;i<train_images2.size();i++)
+        train_images.push_back(train_images2[i]);
+      
+      //hope to reclaim some memory (?)
+      train_images2.clear();
+    }  else {
+      std::set<int> group_set;
+      for(size_t i=0;i<tbl.size();i++)
+      {
+        if(verbose) 
+          std::cout<<tbl[i][0].c_str()<<"\t"<<std::flush;
+          
+        FeatureImageType::Pointer feature=load_image<FeatureImageType>(tbl[i][0].c_str());
+        
+        if(verbose) 
+          std::cout<<tbl[i][1].c_str()<<"\t"<<std::flush;
+        
+        FeatureImageType::Pointer label=load_image<FeatureImageType>(tbl[i][1].c_str());
+        
+        double grading=1;
+        int    group=-1;
+        
+        if(tbl[i].size()>2)
+        {
+          grading=atof(tbl[i][2].c_str());
+          if(verbose)
+            std::cout<<"\t"<<grading;
+        }
+        if(verbose) 
+          std::cout<<std::endl;
+          
+        if(tbl[i].size()>3)
+        {
+          group=atoi(tbl[i][3].c_str());
+          if(verbose)
+            std::cout<<"\t"<<group;
+        }
+        
+        if(verbose) 
+          std::cout<<std::endl;
+        
+        group_set.insert(group);
+        
+        if(extract_label>0 ) //extract label here
+        {
+          FeatureImageType::Pointer label2=extract_label_in_image(label,extract_label);
+          train_images.push_back(ImagePairType(feature,label2,grading,0,group));
+        } else 
+          train_images.push_back(ImagePairType(feature,label,grading,0,group));
+      }
+      if(select_top)
+      {
+        // calculate SSD similarities
+        ssd_distance(train_images,in_img,roi_in,verbose);
+        std::vector<ImagePairType> _train_images;
+        for(std::set<int>::iterator i=group_set.begin();i!=group_set.end();++i)
+        {
+          std::vector<ImagePairType> grp_images;
+          for(std::vector<ImagePairType>::iterator j=train_images.begin();j!=train_images.end();++j)
+          {
+            if((*j).group==(*i)) 
+              grp_images.push_back((*j));
+          }
+          std::sort(grp_images.begin(), grp_images.end(), ssd_compare);
+          for(int k=0;k<select_top && k< grp_images.size(); k++)
+            _train_images.push_back(grp_images[k]);
+        }
+        train_images=_train_images;
+      }
     }
-    
-    if(select_top)
-    {
-      // calculate SSD similarities
-      ssd_distance(train_images ,in_img,roi_in,verbose);
-      ssd_distance(train_images2,in_img,roi_in,verbose);
-      
-      std::sort(train_images.begin(), train_images.end(), ssd_compare);
-      std::sort(train_images2.begin(),train_images2.end(),ssd_compare);
-      
-      if(train_images.size()>select_top)
-        train_images.erase(train_images.begin()+select_top,train_images.end()); 
-      
-      if(train_images2.size()>select_top)
-        train_images2.erase(train_images2.begin()+select_top,train_images2.end()); 
-    }
-    
-    //unite training sets
-    for(size_t i=0;i<train_images2.size();i++)
-      train_images.push_back(train_images2[i]);
-    
-    //hope to reclaim some memory (?)
-    train_images2.clear();
-    
-//     if(verbose && select_top)
-//     {
-//       std::cout<<"After sorting:"<<std::endl;
-//       for(size_t i=0;i<train_images.size();i++)
-//         std::cout<<"\t Image:"<<i<<" SSD="<<train_images[i].similarity<<" Grading="<<train_images[i].grading<<std::endl;
-//     }
-    
+
     //put images into preselection list
     for(size_t i=0;i<train_images.size();i++)
       trg_images.push_back(train_images[i].feature);

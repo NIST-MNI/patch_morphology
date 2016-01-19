@@ -40,9 +40,11 @@ namespace itk
     double              grading;
     /** Subject global similarity*/
     double              similarity;
+    /** Subject group */
+    int  group;
     
-    ImagePair(FeatureImagePointer _f,LabelImagePointer _l,double _g=1.0,double _s=0.0):
-    feature(_f),label(_l),grading(_g),similarity(_s)
+    ImagePair(FeatureImagePointer _f,LabelImagePointer _l,double _g=1.0,double _s=0.0,int _group=-1):
+    feature(_f),label(_l),grading(_g),similarity(_s),group(_group)
     {
     }
   };

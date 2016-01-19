@@ -89,6 +89,9 @@ namespace minc
   //! calculate product of two images within mask
   void masked_mul(minc_float_volume &v2,const minc_float_volume& v1,const minc_byte_volume &mask);
   
+  //! calculate product of two grid volumes within mask
+  void masked_mul(minc_grid_volume &v2,const minc_grid_volume& v1,const minc_byte_volume &mask);
+  
   //! load a minc volume
   void load_volume(const char *fn,minc::minc_grid_volume& vol);
   //! load a minc volume
