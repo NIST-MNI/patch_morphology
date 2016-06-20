@@ -17,6 +17,9 @@
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <itkLightObject.h>
 
+#include "itkLocalMeanFilter.h"
+#include "itkLocalSDFilter.h"
+
 
 namespace itk
 {
@@ -34,12 +37,12 @@ namespace itk
     itkNewMacro(Self);
     itkTypeMacro(NOOPPreselection, itk::LightObject);    
 
-    bool select(const IndexType& src,const IndexType& trg) 
+    bool select(const IndexType& src,const IndexType& trg)  const
     {
       return true;
     }
     
-    bool operator!=(const NOOPPreselection &a)
+    bool operator!=(const NOOPPreselection &a)  const
     {
       return false;
     }
@@ -83,12 +86,12 @@ namespace itk
       _probability=probability*8589934591;//for integer comparision
     }
     
-    bool select(const IndexType& src,const IndexType& trg)
+    bool select(const IndexType& src,const IndexType& trg) const
     {
       return _rng.GetIntegerVariate()<_probability;
     }
     
-    bool operator!=(const RandomPreselection &a)
+    bool operator!=(const RandomPreselection &a)  const
     {
       return false;
     }
@@ -99,6 +102,141 @@ namespace itk
       return *this;
     }
   };
+  
+  
+  template <class TImage,class TPatch> class MeanAndSdPreselectionFilter: public itk::LightObject
+  {
+  public:
+    typedef MeanAndSdPreselectionFilter Self;
+    
+    typedef itk::SmartPointer<Self>        Pointer;
+    typedef itk::SmartPointer<const Self>  ConstPointer;
+    
+    /** Standard New method. */
+    itkNewMacro(Self);
+    /** Runtime information support. */
+    itkTypeMacro(MeanAndSdPreselectionFilter,itk::LightObject);
+    
+    typedef TImage               ImageType;
+    typedef typename ImageType::IndexType IndexType;
+    typedef typename ImageType::Pointer   ImagePointer;
+    typedef typename ImageType::ConstPointer   ConstImagePointer;
+    typedef typename ImageType::PixelType  PixelType;
+    typedef std::vector<ImagePointer> TargetImageVector;
+    
+    typedef LocalSDFilter<TImage,TImage,TPatch>   SDFilterType;
+    typedef LocalMeanFilter<TImage,TImage,TPatch> MeanFilterType; 
+    
+    typedef typename SDFilterType::Pointer        SDFilterPointer;
+    typedef typename MeanFilterType::Pointer      MeanFilterPointer;
+    
+//     typedef itk::ImageDuplicator<TImage>          DuplicatorType;
+//     typedef typename DuplicatorType::Pointer      DuplicatorPointer;
+    
+  public:
+    
+    //! evaluate if given indexes are similar enough, according to Pierrick's code
+    bool select(const IndexType& src,const IndexType& trg)  const
+    {
+      const double epsi=1e-4;
+      double Mean=m_src_mean->GetPixel(src);
+      double Var=m_src_sd->GetPixel(src);
+      
+      double TMean=m_src_mean->GetPixel(trg);
+      double TVar=m_src_sd->GetPixel(trg);
+      
+      /*Similar Luminance and contrast -> Cf Wang TIP 2004*/
+      double th = ((2 * Mean * TMean + epsi) / ( Mean*Mean + TMean*TMean + epsi))  * ((2 * Var*TVar + epsi) / (Var*Var + TVar*TVar + epsi));
+      
+      return th>m_Threshold;
+    }
+    
+    bool operator!=(const MeanAndSdPreselectionFilter &a)  const
+    {
+      return true;
+    }
+    
+    MeanAndSdPreselectionFilter& operator=(const MeanAndSdPreselectionFilter& another)
+    {
+      m_Patch=another.m_Patch;
+      
+      m_src_mean=another.m_src_mean;
+      m_src_sd=another.m_src_sd;
+      
+      m_target_mean=another.m_target_mean;
+      m_target_sd=another.m_target_sd;
+      
+      m_th_m=another.m_th_m;
+      m_th_v=another.m_th_v;
+      
+      return *this;
+    }
+    
+    MeanAndSdPreselectionFilter():
+      m_Threshold(0.97)
+    {
+    }
+    
+    MeanAndSdPreselectionFilter(const MeanAndSdPreselectionFilter& another):
+      m_Patch(another.m_Patch),
+      m_src_mean(another.m_src_mean),
+      m_src_sd(another.m_src_sd),
+      m_target_mean(another.m_target_mean),
+      m_target_sd(another.m_target_sd),
+      m_Threshold(another.m_Threshold)
+    {
+    }
+    
+    void SetPatchKernel(const TPatch& p)
+    {
+      m_Patch=p;
+    }
+    
+    TPatch& GetPatchKernel(void)
+    {
+      return m_Patch;
+    }
+    
+    void SetThresholds(PixelType th_m,PixelType th_v)
+    {
+      m_th_m=th_m;
+      m_th_v=th_v;
+    }
+    
+    void SetImage(ImagePointer src)
+    {
+      SDFilterPointer   sd_filter   = SDFilterType::New();
+      MeanFilterPointer mean_filter = MeanFilterType::New();
+      
+      sd_filter->SetKernel( m_Patch );
+      mean_filter->SetKernel( m_Patch );
+      
+      mean_filter->SetInput(src);
+      sd_filter->SetInput(src);
+      
+      mean_filter->Update();
+      sd_filter->Update();  
+      
+      m_src_mean=mean_filter->GetOutput();
+      
+      m_src_sd=sd_filter->GetOutput();
+    }
+    
+  protected:
+    TPatch            m_Patch;
+    PixelType         m_th_m;
+    PixelType         m_th_v;
+
+    ImagePointer      m_src_mean;
+    ImagePointer      m_src_sd;
+  };
+
+  template<class TImage,class TPatch>
+      std::ostream & operator<<(std::ostream &os, const MeanAndSdPreselectionFilter<TImage,TPatch> &w)
+  {
+    os << "[ MeanAndSdPreselectionFilter<TImage,TPatch> ]";
+    return os;
+  }  
 };
 
 #endif //__mincPreselectionFilter_h__

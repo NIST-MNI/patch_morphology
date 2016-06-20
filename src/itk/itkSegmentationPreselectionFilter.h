@@ -66,10 +66,10 @@ namespace itk
     return os;
   }
 
-  template <class TImage,class TPatch> class MeanAndSdPreselectionFilter: public itk::LightObject
+  template <class TImage,class TPatch> class SegmentationMeanAndSdPreselectionFilter: public itk::LightObject
   {
   public:
-    typedef MeanAndSdPreselectionFilter Self;
+    typedef SegmentationMeanAndSdPreselectionFilter Self;
     
     typedef itk::SmartPointer<Self>        Pointer;
     typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -77,7 +77,7 @@ namespace itk
     /** Standard New method. */
     itkNewMacro(Self);
     /** Runtime information support. */
-    itkTypeMacro(MeanAndSdPreselectionFilter,itk::LightObject);
+    itkTypeMacro(SegmentationMeanAndSdPreselectionFilter,itk::LightObject);
     
     typedef TImage               ImageType;
     typedef typename ImageType::IndexType IndexType;
@@ -112,12 +112,12 @@ namespace itk
       return th>m_Threshold;
     }
     
-    bool operator!=(const MeanAndSdPreselectionFilter &a)
+    bool operator!=(const SegmentationMeanAndSdPreselectionFilter &a)
     {
       return true;
     }
     
-    MeanAndSdPreselectionFilter& operator=(const MeanAndSdPreselectionFilter& another)
+    SegmentationMeanAndSdPreselectionFilter& operator=(const SegmentationMeanAndSdPreselectionFilter& another)
     {
       m_Patch=another.m_Patch;
       
@@ -132,12 +132,12 @@ namespace itk
       return *this;
     }
     
-    MeanAndSdPreselectionFilter():
+    SegmentationMeanAndSdPreselectionFilter():
       m_Threshold(0.97)
     {
     }
     
-    MeanAndSdPreselectionFilter(const MeanAndSdPreselectionFilter& another):
+    SegmentationMeanAndSdPreselectionFilter(const SegmentationMeanAndSdPreselectionFilter& another):
       m_Patch(another.m_Patch),
       m_src_mean(another.m_src_mean),
       m_src_sd(another.m_src_sd),
@@ -227,11 +227,13 @@ namespace itk
   };
 
   template<class TImage,class TPatch>
-      std::ostream & operator<<(std::ostream &os, const MeanAndSdPreselectionFilter<TImage,TPatch> &w)
+      std::ostream & operator<<(std::ostream &os, const SegmentationMeanAndSdPreselectionFilter<TImage,TPatch> &w)
   {
-    os << "[ MeanAndSdPreselectionFilter<TImage,TPatch> ]";
+    os << "[ SegmentationMeanAndSdPreselectionFilter<TImage,TPatch> ]";
     return os;
   }
-}; //minc
+}; //itk
 
 #endif //__mincSegmentationPreselectionFilter_h__
+
+// kate: space-indent on; indent-width 2; indent-mode C++;replace-tabs on;word-wrap-column 80;show-tabs on;tab-width 2

@@ -65,7 +65,7 @@ namespace itk
           cnt++;
         }
       }
-      return total/cnt;
+      return total;
     }
 
     bool operator!=(const Self &a)

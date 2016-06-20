@@ -13,8 +13,8 @@
               (at your option) any later version.
 ---------------------------------------------------------------------------- */
 
-#ifndef __mincClassicalNonLocalFilter_h
-#define __mincClassicalNonLocalFilter_h
+#ifndef __itkClassicalNonLocalFilter_h
+#define __itkClassicalNonLocalFilter_h
 
 #include "itkNonLocalPatchesFilter.h"
 #include "itkPatchDistance.h"
@@ -76,13 +76,12 @@ namespace itk
 
     /** Type of the pixels in the Kernel. */
     typedef typename TSearch::PixelType            KernelPixelType;
-    
+
     /** Set squared sigma. */
     itkSetMacro(sigma2, double);
     /** Get squared sigma. */
     itkGetMacro(sigma2, double);
 
-    
     /** Set weight functor. */
     itkSetMacro(Weight, TWeight);
     /** Get weight functor. */
@@ -97,6 +96,7 @@ namespace itk
     itkSetMacro(OutputMeanWeight,bool);
     /** get output weight flag */
     itkGetMacro(OutputMeanWeight,bool);
+    
     
 
   // #ifdef ITK_USE_CONCEPT_CHECKING
@@ -140,15 +140,18 @@ namespace itk
     ClassicalNonLocalFilter(const Self&); //purposely not implemented
     void operator=(const Self&); //purposely not implemented
     
-    double    m_sigma2;
+    double              m_sigma2;
     DistancePointerType m_Distance;
-    TWeight   m_Weight;
-    bool      m_OutputMeanWeight;
+    
+    TWeight             m_Weight;
+    bool                m_OutputMeanWeight;
 
   }; // end of class
-  
-} //minc
+
+} // end namespace itk
 
 #include "itkClassicalNonLocalFilter.txx"
 
-#endif //__mincClassicalNonLocalFilter_h
+#endif //__itkClassicalNonLocalFilter_h
+
+// kate: space-indent on; indent-width 2; indent-mode C++;replace-tabs on;word-wrap-column 80;show-tabs on;tab-width 2

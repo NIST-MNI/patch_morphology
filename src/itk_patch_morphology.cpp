@@ -45,7 +45,7 @@ typedef itk::MinWeightedDiscreteLabeling<float,unsigned char,itk::InvExpWeight<d
 //typedef itk::MinimalDistanceNonLocalFilter<float,float,itk::InvExpWeight<double>,3 > MinWeightedAverageLabelingType;
 
 
-typedef itk::MeanAndSdPreselectionFilter<FeatureImageType,StructuringElementType>  MeanAndSdPreselectionType;
+typedef itk::SegmentationMeanAndSdPreselectionFilter<FeatureImageType,StructuringElementType>  MeanAndSdPreselectionType;
 
 typedef itk::SegmentationNonLocalFilter<
                             FeatureImageType,

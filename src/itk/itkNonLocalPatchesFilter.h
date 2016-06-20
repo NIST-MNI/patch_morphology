@@ -210,12 +210,12 @@ protected:
   ImageBoundaryConditionPointerType m_BoundaryCondition;
 
   /** Default boundary condition */
-  DefaultBoundaryConditionType m_DefaultBoundaryCondition;
+  DefaultBoundaryConditionType   m_DefaultBoundaryCondition;
 	
-	OutputImagePointer m_Weights;
-	OutputImagePointer m_SmallestWeights;
-	RoiImagePointer    m_RoiImage;
-	PreselectionFilterPointerType m_PreselectionFilter;
+	OutputImagePointer             m_Weights;
+	OutputImagePointer             m_SmallestWeights;
+	RoiImagePointer                m_RoiImage;
+	PreselectionFilterPointerType  m_PreselectionFilter;
 	
 }; // end of class
 
@@ -225,5 +225,6 @@ protected:
 #include "itkNonLocalPatchesFilter.txx"
 //#endif
 
-
 #endif
+
+// kate: space-indent on; indent-width 2; indent-mode C++;replace-tabs on;word-wrap-column 80;show-tabs on;tab-width 2

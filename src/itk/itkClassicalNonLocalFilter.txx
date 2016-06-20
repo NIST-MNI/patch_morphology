@@ -12,8 +12,8 @@
               the Free Software Foundation, either version 3 of the License, or
               (at your option) any later version.
 ---------------------------------------------------------------------------- */
-#ifndef __mincClassicalNonLocalFilter_txx
-#define __mincClassicalNonLocalFilter_txx
+#ifndef __itkClassicalNonLocalFilter_txx
+#define __itkClassicalNonLocalFilter_txx
 
 
 namespace itk {
@@ -45,7 +45,7 @@ ClassicalNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, T
 
   double total_weight=0.0;
   double total=0.0;
-  double smallest_weight=0.0;
+  double max_weight=0.0;
   
   for( i=0, kernel_it=searchKernelBegin; kernel_it<searchKernelEnd; ++kernel_it, ++i )
   {
@@ -62,19 +62,27 @@ ClassicalNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, T
       //TODO: move distance & weight calculations into templates
       double distance=0;
       
-      if(i!=center) 
+      if(i!=center)
+      {
         distance=m_Distance->distance(patchIt1,patchIt2,patchKernelBegin,patchKernelEnd);
 
-      double weight=m_Weight(distance,m_sigma2);
-      total_weight+=weight;
-      total+=searchIt.GetPixel(i)*weight;
-      if(i!=center && (weight>smallest_weight || smallest_weight==0.0))
-        smallest_weight=weight;
+        double weight=m_Weight(distance,m_sigma2);
+        total_weight+=weight;
+        total+=searchIt.GetPixel(i)*weight;
+        
+        if(weight>max_weight || max_weight==0.0)
+          max_weight=weight;
+      }
     }
   }
+  
   //add central voxel
+  total += searchIt.GetPixel(center)*max_weight; 
+  total_weight +=  max_weight;
+  
+  // store parameters
   this->m_Weights->SetPixel(searchIt.GetIndex(center),total_weight);
-  this->m_SmallestWeights->SetPixel(searchIt.GetIndex(center),smallest_weight);
+  this->m_SmallestWeights->SetPixel(searchIt.GetIndex(center),max_weight);
   
   if(total_weight==0.0)
   {
@@ -98,6 +106,7 @@ void ClassicalNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistan
 
 
 }// end namespace itk
+
 #endif
 
 // kate: space-indent on; hl c++;indent-width 2; indent-mode cstyle;replace-tabs on;word-wrap-column 80;tab-width 2 
