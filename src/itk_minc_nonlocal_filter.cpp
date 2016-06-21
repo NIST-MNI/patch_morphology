@@ -281,7 +281,7 @@ template<class TElement,
   _preselect->SetImage(img_in);
   _preselect->SetThresholds(th_m, th_v);
   flt->SetPreselectionFilter(_preselect);
-  std::cout<<flt<<std::endl;
+  //std::cout<<flt<<std::endl;
   
   return flt.GetPointer();
 }
@@ -392,7 +392,7 @@ template<class TElement,
   _preselect->SetImage(img_in);
   _preselect->SetThresholds(th_m, th_v);
   flt->SetPreselectionFilter(_preselect);
-  std::cout<<flt<<std::endl;
+  //std::cout<<flt<<std::endl;
   
   return flt.GetPointer();
 }
@@ -423,7 +423,8 @@ int main (int argc, char **argv)
   int calc_log=0;
   int calc_similarity=0;
   int calc_mweight=0;
-  int use_preselect=0;
+  
+  int use_preselect=1;
   
   double th_m=0.95;
   double th_v=0.5;
