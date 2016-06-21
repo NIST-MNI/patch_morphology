@@ -238,7 +238,7 @@ VariableNoiseNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistanc
 
   double total_weight=0.0;
   double total=0.0;
-  double smallest_weight=0.0;
+  double largest_weight=0.0;
   //variable noise part 
   
   if( sigma2 > SIGMA_EPSILON )
@@ -256,22 +256,27 @@ VariableNoiseNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistanc
         
         double distance=0.0;
         
-        if(i!=center) 
+        if(i!=center)
+        {
           distance=m_Distance->distance(patchIt1,patchIt2,patchKernelBegin,patchKernelEnd);
-
-        double weight=m_Weight(distance,sigma2);
+          double weight=m_Weight(distance,sigma2);
         
-        total_weight+=weight;
-        total+=searchIt.GetPixel(i)*weight;
+          total_weight+=weight;
+          total+=searchIt.GetPixel(i)*weight;
+          if(weight>largest_weight) largest_weight=weight;
+        }
       }
     }
   }
-  
   if(total_weight==0.0)
   {
     total=searchIt.GetPixel(center);
     total_weight=1.0;
   }
+  
+  // add central voxel
+  total+=searchIt.GetPixel(center)*largest_weight;
+  total_weight+=largest_weight;
   
   if(m_OutputMeanWeight)
     return (PixelType)(total_weight/i);
@@ -287,9 +292,8 @@ void VariableNoiseNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDi
   
   os << indent << "Search Kernel: "      << m_SearchKernel << std::endl;
   os << indent << "Patch Kernel: "       << m_PatchKernel  << std::endl;
-  os << indent << "Boundary condition: " << typeid( *m_BoundaryCondition ).name() << std::endl;
+  os << indent << "Preselection filter: " << (*m_PreselectionFilter) << std::endl;
   os << indent << "Beta:"                << m_Beta << std::endl;
-  
 }
 
 template<class TInputImage, class TOutputImage, class TSearch,class TPatch,class TDistance,class TWeight,class TPreselectionFilter>
@@ -309,6 +313,7 @@ void VariableNoiseNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDi
 
 
 }// end namespace itk
+
 #endif
 
 // kate: space-indent on; indent-width 2; indent-mode C++;replace-tabs on;word-wrap-column 80;show-tabs on;tab-width 2; hl C++

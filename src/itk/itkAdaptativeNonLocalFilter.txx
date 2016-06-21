@@ -147,9 +147,9 @@ AdaptativeNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, 
   progress->RegisterInternalFilter(mean,this->GetPatchKernel().Size()/total);
   progress->RegisterInternalFilter(sub,1.0/total);
   progress->RegisterInternalFilter(mdist,this->GetPatchKernel().Size()*this->GetSearchKernel().Size()/total);
-  if(m_Regularize>0.1) 
+  if(m_Regularize>1e-4) 
   {
-    progress->RegisterInternalFilter(regularize,1.0/total);
+    progress->RegisterInternalFilter(regularize, 1.0/total );
   }
 
   progress->RegisterInternalFilter(vn,this->GetPatchKernel().Size()*this->GetSearchKernel().Size()/total);
@@ -171,12 +171,12 @@ void AdaptativeNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDista
 {
   Superclass::PrintSelf(os, indent);
   
-  os << indent << "Search Kernel: " << m_SearchKernel << std::endl;
-  os << indent << "Patch Kernel: "  << m_PatchKernel  << std::endl;
-  os << indent << "Boundary condition: " << typeid( *m_BoundaryCondition ).name() << std::endl;
+  os << indent << "Search Kernel: "       << m_SearchKernel << std::endl;
+  os << indent << "Patch Kernel: "        << m_PatchKernel  << std::endl;
+  os << indent << "Boundary condition: "  << typeid( *m_BoundaryCondition ).name() << std::endl;
   os << indent << "Preselection filter: " << typeid( m_PreselectionFilter ).name() << std::endl;
-  os << indent << "Beta: " << m_Beta << std::endl;
-  os << indent << "Regularize: " << m_Regularize << std::endl;
+  os << indent << "Beta: "                << m_Beta << std::endl;
+  os << indent << "Regularize: "          << m_Regularize << std::endl;
   
 }
 

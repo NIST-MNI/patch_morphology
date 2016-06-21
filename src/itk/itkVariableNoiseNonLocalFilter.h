@@ -234,11 +234,11 @@ namespace itk
     DefaultBoundaryConditionType m_DefaultBoundaryCondition;
     
     DistancePointerType m_Distance;
-    TWeight   m_Weight;
-    bool      m_OutputMeanWeight;
+    TWeight            m_Weight;
+    bool               m_OutputMeanWeight;
     RoiImagePointer    m_RoiImage;
     PreselectionFilterPointerType m_PreselectionFilter;
-    double    m_Beta;
+    double              m_Beta;
 
   }; // end of class
 

@@ -12,7 +12,7 @@
               the Free Software Foundation, either version 3 of the License, or
               (at your option) any later version.
 ---------------------------------------------------------------------------- */
-#ifndef __mincPreselectionFilter_h__
+#ifndef __itkPreselectionFilter_h__
 
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <itkLightObject.h>
@@ -51,7 +51,16 @@ namespace itk
     {
       return *this;
     }
+
+    void SetImage(DataObject::Pointer src)
+    {
+      //NOOP
+    }
     
+     void SetThresholds(float th_m,float th_v)
+     {
+      //NOOP
+     }
   };
   
   template<int dim>
@@ -86,7 +95,7 @@ namespace itk
       _probability=probability*8589934591;//for integer comparision
     }
     
-    bool select(const IndexType& src,const IndexType& trg) const
+    bool select(const IndexType& src,const IndexType& trg)
     {
       return _rng.GetIntegerVariate()<_probability;
     }
@@ -101,6 +110,17 @@ namespace itk
       _probability=another._probability;
       return *this;
     }
+    
+    void SetImage(DataObject::Pointer src)
+    {
+      //NOOP
+    }
+    
+    void SetThresholds(float th_m,float th_v)
+    {
+    //NOOP
+    }
+    
   };
   
   
@@ -139,16 +159,25 @@ namespace itk
     bool select(const IndexType& src,const IndexType& trg)  const
     {
       const double epsi=1e-4;
-      double Mean=m_src_mean->GetPixel(src);
-      double Var=m_src_sd->GetPixel(src);
       
-      double TMean=m_src_mean->GetPixel(trg);
-      double TVar=m_src_sd->GetPixel(trg);
+      double SMean= this->m_src_mean->GetPixel(src);
+      double SVar=  this->m_src_sd->GetPixel(src);
+      
+      double TMean= this->m_src_mean->GetPixel(trg);
+      double TVar=  this->m_src_sd->GetPixel(trg);
       
       /*Similar Luminance and contrast -> Cf Wang TIP 2004*/
-      double th = ((2 * Mean * TMean + epsi) / ( Mean*Mean + TMean*TMean + epsi))  * ((2 * Var*TVar + epsi) / (Var*Var + TVar*TVar + epsi));
+//       double th = ((2 * Mean * TMean + epsi) / ( Mean*Mean + TMean*TMean + epsi))  * ((2 * Var*TVar + epsi) / (Var*Var + TVar*TVar + epsi));
       
-      return th>m_Threshold;
+//       return th>m_Threshold;
+
+      if(TMean < epsi || TVar<epsi) return true;
+
+      double ratio  = SMean/TMean;
+      double ratio2 = SVar/TVar;
+      
+      return  (m_th_m <= ratio)  &&  (ratio <= m_th_m_inv) && 
+              (m_th_v <= ratio2) && (ratio2 <= m_th_v_inv) ;
     }
     
     bool operator!=(const MeanAndSdPreselectionFilter &a)  const
@@ -158,33 +187,26 @@ namespace itk
     
     MeanAndSdPreselectionFilter& operator=(const MeanAndSdPreselectionFilter& another)
     {
-      m_Patch=another.m_Patch;
+      this->m_Patch=another.m_Patch;
       
-      m_src_mean=another.m_src_mean;
-      m_src_sd=another.m_src_sd;
+      this->m_src_mean=another.m_src_mean;
+      this->m_src_sd=another.m_src_sd;
       
-      m_target_mean=another.m_target_mean;
-      m_target_sd=another.m_target_sd;
-      
-      m_th_m=another.m_th_m;
-      m_th_v=another.m_th_v;
-      
+      this->SetThresholds(another.m_th_m,another.m_th_v);
       return *this;
     }
     
-    MeanAndSdPreselectionFilter():
-      m_Threshold(0.97)
+    MeanAndSdPreselectionFilter()
     {
+      this->SetThresholds(0.95,0.5);
     }
     
     MeanAndSdPreselectionFilter(const MeanAndSdPreselectionFilter& another):
       m_Patch(another.m_Patch),
       m_src_mean(another.m_src_mean),
-      m_src_sd(another.m_src_sd),
-      m_target_mean(another.m_target_mean),
-      m_target_sd(another.m_target_sd),
-      m_Threshold(another.m_Threshold)
+      m_src_sd(another.m_src_sd)
     {
+      this->SetThresholds(another.m_th_m,another.m_th_v);
     }
     
     void SetPatchKernel(const TPatch& p)
@@ -197,10 +219,18 @@ namespace itk
       return m_Patch;
     }
     
+    const TPatch& GetPatchKernel(void) const
+    {
+      return m_Patch;
+    }
+    
     void SetThresholds(PixelType th_m,PixelType th_v)
     {
       m_th_m=th_m;
       m_th_v=th_v;
+      
+      m_th_m_inv=1.0/m_th_m;
+      m_th_v_inv=1.0/m_th_v;
     }
     
     void SetImage(ImagePointer src)
@@ -218,14 +248,26 @@ namespace itk
       sd_filter->Update();  
       
       m_src_mean=mean_filter->GetOutput();
-      
       m_src_sd=sd_filter->GetOutput();
+      
+      m_src_mean->DisconnectPipeline  (   ) ;
+      m_src_sd->DisconnectPipeline  (   ) ;
+    }
+    
+    PixelType Get_th_m(void) const
+    {
+      return m_th_m;
+    }
+    
+    PixelType Get_th_v(void) const
+    {
+      return m_th_v;
     }
     
   protected:
     TPatch            m_Patch;
-    PixelType         m_th_m;
-    PixelType         m_th_v;
+    PixelType         m_th_m,m_th_m_inv;
+    PixelType         m_th_v,m_th_v_inv;
 
     ImagePointer      m_src_mean;
     ImagePointer      m_src_sd;
@@ -234,11 +276,14 @@ namespace itk
   template<class TImage,class TPatch>
       std::ostream & operator<<(std::ostream &os, const MeanAndSdPreselectionFilter<TImage,TPatch> &w)
   {
-    os << "[ MeanAndSdPreselectionFilter<TImage,TPatch> ]";
+    os << "[ MeanAndSdPreselectionFilter<TImage,TPatch> ";
+    os << "m_th_m="<<w.Get_th_m()<<" ";
+    os << "m_th_v="<<w.Get_th_v()<<" ";
+    os << "Patch="<<w.GetPatchKernel() << " ]"<<std::endl;
     return os;
   }  
 };
 
-#endif //__mincPreselectionFilter_h__
+#endif //__itkPreselectionFilter_h__
 
 // kate: space-indent on; indent-width 2; indent-mode C++;replace-tabs on;word-wrap-column 80;show-tabs on;tab-width 2; hl C++

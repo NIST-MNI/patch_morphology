@@ -57,7 +57,7 @@ ClassicalNonLocalFilter<TInputImage, TOutputImage, TSearch, TPatch, TDistance, T
       
       if(!patchIt2.InBounds()) continue;
       
-      if(!flt->select(patchIt1.GetIndex(),patchIt2.GetIndex())) continue;
+      if(!flt->select(patchIt1.GetIndex(), patchIt2.GetIndex())) continue;
 
       //TODO: move distance & weight calculations into templates
       double distance=0;

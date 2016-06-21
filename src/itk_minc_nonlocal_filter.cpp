@@ -18,7 +18,6 @@
 #include "itkHelpers.h"
 #include "itkClassicalNonLocalFilter.h"
 
-#include <itkBinaryBallStructuringElement.h>
 #include <itkFlatStructuringElement.h>
 #include <itkSubtractImageFilter.h>
 #include <itkUnaryFunctorImageFilter.h>
@@ -38,7 +37,7 @@
 
 #include <iostream>
 
-typedef itk::BinaryBallStructuringElement< itk::mask3d::PixelType, 3  >  BallStructuringElementType;
+//typedef itk::BinaryBallStructuringElement< itk::mask3d::PixelType, 3  >  FlatStructuringElementType;
 typedef itk::FlatStructuringElement<3> FlatStructuringElementType;
 
 typedef itk::image3d InputImageType;
@@ -48,60 +47,49 @@ typedef itk::image3d OutputImageType;
 typedef itk::MinimalDistanceNonLocalFilter<
                             InputImageType,
                             OutputImageType,
-                            BallStructuringElementType,
-                            BallStructuringElementType,
-                            itk::L2PatchDistance<InputImageType,BallStructuringElementType> >  MinimalDistanceFilterType;
+                            FlatStructuringElementType,
+                            FlatStructuringElementType,
+                            itk::L2PatchDistance<InputImageType,FlatStructuringElementType> >  MinimalDistanceFilterType;
 
 typedef itk::MedianDistanceNonLocalFilter<
                             InputImageType,
                             OutputImageType,
-                            BallStructuringElementType,
-                            BallStructuringElementType,
-                            itk::L2PatchDistance<InputImageType,BallStructuringElementType> >  MedianDistanceFilterType;
-
-                            
-                            
-                           
-typedef itk::VariableNoiseNonLocalFilter<
-                            InputImageType,
-                            OutputImageType,
-                            BallStructuringElementType,
-                            BallStructuringElementType,
-                            itk::L2PatchDistance<InputImageType,BallStructuringElementType>,
-                            itk::InvExpWeight<double> >  VariableNoiseFilterType;
+                            FlatStructuringElementType,
+                            FlatStructuringElementType,
+                            itk::L2PatchDistance<InputImageType,FlatStructuringElementType> >  MedianDistanceFilterType;
 
 typedef itk::AdaptativeNonLocalFilter<
                             InputImageType,
                             OutputImageType,
-                            BallStructuringElementType,
-                            BallStructuringElementType,
-                            itk::L2PatchDistance<InputImageType,BallStructuringElementType>,
-                            itk::InvExpWeight<double> >  AdaptativeFilterType;														
+                            FlatStructuringElementType,
+                            FlatStructuringElementType,
+                            itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+                            itk::InvExpWeight<double> >  AdaptativeFilterType;
 
 typedef itk::NoiseMedianDistanceNonLocalFilter<
                             InputImageType,
                             OutputImageType,
-                            BallStructuringElementType,
-                            BallStructuringElementType,
-                            itk::L2PatchDistance<InputImageType,BallStructuringElementType>,
-                            itk::InvExpWeight<double> >  NoiseMedianDistanceFilterType;                           
+                            FlatStructuringElementType,
+                            FlatStructuringElementType,
+                            itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+                            itk::InvExpWeight<double> >  NoiseMedianDistanceFilterType;
                             
 
 typedef itk::MeanWeightNonLocalFilter<
                             InputImageType,
                             OutputImageType,
-                            BallStructuringElementType,
-                            BallStructuringElementType,
-                            itk::L2PatchDistance<InputImageType,BallStructuringElementType>,
-                            itk::InvExpWeight<double> >  SimilarityFilterType;                           
+                            FlatStructuringElementType,
+                            FlatStructuringElementType,
+                            itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+                            itk::InvExpWeight<double> >  SimilarityFilterType;
                             
 typedef itk::LocalSDFilter<InputImageType,
                             OutputImageType,
-                            BallStructuringElementType> SDFilterType;
+                            FlatStructuringElementType> SDFilterType;
 
 typedef itk::LocalMeanFilter<InputImageType,
                             OutputImageType,
-                            BallStructuringElementType> MeanFilterType;
+                            FlatStructuringElementType> MeanFilterType;
                             
                             
 typedef itk::ImageToImageFilter<InputImageType,OutputImageType> ImageToImageFlt;
@@ -194,7 +182,8 @@ class CommandProgressUpdate : public itk::Command
 
 
 template<class TElement,
-         class TDistance, class TWeight,
+         class TDistance, 
+         class TWeight,
          class TPreselect > 
 typename itk::ClassicalNonLocalFilter<
                   InputImageType,
@@ -203,8 +192,12 @@ typename itk::ClassicalNonLocalFilter<
                   TElement,
                   itk::L2PatchDistance<InputImageType,TElement>,
                   itk::InvExpWeight<double>,
-                  TPreselect >::Pointer 
-    CreateClassicalNonLocalFilter(int search, int patch, double noise, InputImageType::Pointer img_in,itk::mask3d::Pointer roi_in )
+                  TPreselect >::Pointer
+    CreateClassicalNonLocalFilter(int search, int patch, double noise, 
+                                  InputImageType::Pointer img_in,
+                                  itk::mask3d::Pointer roi_in,
+                                  bool calc_mweight, 
+                                  bool flat_element )
 {
     typedef itk::ClassicalNonLocalFilter<
                   InputImageType,
@@ -216,12 +209,21 @@ typename itk::ClassicalNonLocalFilter<
                   TPreselect >  
           NonLocalFilterType;
 
-    typename NonLocalFilterType::Pointer flt(NonLocalFilterType::New());
+    typename NonLocalFilterType::Pointer flt=NonLocalFilterType::New();
     itk::Size<3> srad; srad.Fill(search);
     itk::Size<3> prad; prad.Fill(patch);
 
-    FlatStructuringElementType  searchKernel=FlatStructuringElementType::Box( srad);
-    FlatStructuringElementType  patchKernel=FlatStructuringElementType::Box( prad );
+    TElement  searchKernel;
+    TElement  patchKernel;
+    
+    if(flat_element)
+    {
+      searchKernel =TElement::Box( srad);
+      patchKernel = TElement::Box( prad );
+    }  else {
+      searchKernel=TElement::Ball( srad);
+      patchKernel=  TElement::Ball( prad );
+    }
     
     flt->SetSearchKernel( searchKernel );
     flt->SetPatchKernel( patchKernel );
@@ -232,39 +234,174 @@ typename itk::ClassicalNonLocalFilter<
     
     if(roi_in.IsNotNull())
       flt->SetRoiImage(roi_in);
-      
+    
+    //flt->PrintSelf(std::cout,1);
+    
     return flt;
 }
 
 template<class TElement,
-         class TDistance, class TWeight,
+         class TDistance, 
+         class TWeight,
          class TPreselect > 
-ImageToImageFlt::Pointer 
-    CreateClassicalNonLocalFilterWithPS(int search, int patch, double noise, InputImageType::Pointer img_in,itk::mask3d::Pointer roi_in,double th_m,double th_v )
+  ImageToImageFlt::Pointer
+    CreateClassicalNonLocalFilterWithPS(int search, int patch, 
+                                        double noise, InputImageType::Pointer img_in,
+                                        itk::mask3d::Pointer roi_in, bool calc_mweight,
+                                        bool flat_element,
+                                        double th_m, double th_v )
 {
-    typedef itk::ClassicalNonLocalFilter<
-                  InputImageType,
-                  OutputImageType,
-                  TElement,
-                  TElement,
-                  itk::L2PatchDistance<InputImageType,TElement>,
-                  itk::InvExpWeight<double>,
-                  TPreselect >  
-          NonLocalFilterType;
+  typedef itk::ClassicalNonLocalFilter<
+                InputImageType,
+                OutputImageType,
+                TElement,
+                TElement,
+                itk::L2PatchDistance<InputImageType,TElement>,
+                itk::InvExpWeight<double>,
+                TPreselect >
+        NonLocalFilterType;
 
-    typename NonLocalFilterType::Pointer flt=CreateClassicalNonLocalFilter<>(search,patch,noise,img_in,roi_in);
+  typename NonLocalFilterType::Pointer flt = CreateClassicalNonLocalFilter
+        <TElement,TDistance,TWeight,TPreselect> (search,patch,noise,img_in,roi_in, calc_mweight, flat_element);
+  
+  typename TPreselect::Pointer _preselect=TPreselect::New();
+  
+    itk::Size<3> prad; prad.Fill(patch);
+
+    TElement  patchKernel;
     
-    
-    TPreselect _preselect;
-    _preselect.SetImages()
-    flt->SetPreselectionFilter(_preselect);
-    
-    
-      
-    return flt;
+    if(flat_element)
+    {
+      patchKernel = TElement::Box( prad );
+    }  else {
+      patchKernel=  TElement::Ball( prad );
+    }
+  
+  _preselect->SetPatchKernel(patchKernel);
+  _preselect->SetImage(img_in);
+  _preselect->SetThresholds(th_m, th_v);
+  flt->SetPreselectionFilter(_preselect);
+  std::cout<<flt<<std::endl;
+  
+  return flt.GetPointer();
 }
 
 
+template<class TElement,
+         class TDistance, 
+         class TWeight,
+         class TPreselect > 
+typename itk::AdaptativeNonLocalFilter<
+              InputImageType,
+              OutputImageType,
+              TElement,
+              TElement,
+              itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+              itk::InvExpWeight<double>,
+              TPreselect >::Pointer
+    CreateAdaptativeNonLocalFilter(int search, int patch, 
+                                  double beta, double regularize,  
+                                  InputImageType::Pointer img_in,
+                                  itk::mask3d::Pointer roi_in,
+                                  bool calc_mweight, 
+                                  bool flat_element )
+{
+    typedef itk::AdaptativeNonLocalFilter<
+              InputImageType,
+              OutputImageType,
+              TElement,
+              TElement,
+              itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+              itk::InvExpWeight<double>,
+              TPreselect >  
+          NonLocalFilterType;
+
+    typename NonLocalFilterType::Pointer flt=NonLocalFilterType::New();
+    itk::Size<3> srad; srad.Fill(search);
+    itk::Size<3> prad; prad.Fill(patch);
+
+    TElement  searchKernel;
+    TElement  patchKernel;
+    
+    if(flat_element)
+    {
+      searchKernel =TElement::Box( srad);
+      patchKernel = TElement::Box( prad );
+    }  else {
+      searchKernel=TElement::Ball( srad);
+      patchKernel=  TElement::Ball( prad );
+    }
+    
+    flt->SetSearchKernel( searchKernel );
+    flt->SetPatchKernel( patchKernel );
+    
+    flt->SetBeta( beta );
+    flt->SetRegularize( regularize );
+    
+    flt->SetInput(img_in);
+    flt->SetOutputMeanWeight(calc_mweight);
+    
+    if(roi_in.IsNotNull())
+      flt->SetRoiImage(roi_in);
+    
+    //flt->PrintSelf(std::cout,1);
+    
+    return flt;
+}
+
+template<class TElement,
+         class TDistance, 
+         class TWeight,
+         class TPreselect > 
+  ImageToImageFlt::Pointer
+    CreateAdaptativeNonLocalFilterWithPS(int search, int patch, 
+                                         double beta, double regularize, 
+                                         InputImageType::Pointer img_in,
+                                         itk::mask3d::Pointer roi_in, bool calc_mweight,
+                                         bool flat_element,
+                                         double th_m, double th_v )
+{
+  typedef itk::AdaptativeNonLocalFilter<
+              InputImageType,
+              OutputImageType,
+              TElement,
+              TElement,
+              itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+              itk::InvExpWeight<double>,
+              TPreselect >
+        NonLocalFilterType;
+
+  typename NonLocalFilterType::Pointer flt = CreateAdaptativeNonLocalFilter
+      <TElement,TDistance,TWeight,TPreselect> (search, patch, beta, 
+                            regularize, img_in, roi_in, calc_mweight, flat_element);
+
+  typename TPreselect::Pointer _preselect=TPreselect::New();
+
+  itk::Size<3> prad; prad.Fill(patch);
+
+  TElement  patchKernel;
+
+  if(flat_element)
+  {
+    patchKernel = TElement::Box( prad );
+  }  else {
+    patchKernel=  TElement::Ball( prad );
+  }
+  
+  _preselect->SetPatchKernel(patchKernel);
+  _preselect->SetImage(img_in);
+  _preselect->SetThresholds(th_m, th_v);
+  flt->SetPreselectionFilter(_preselect);
+  std::cout<<flt<<std::endl;
+  
+  return flt.GetPointer();
+}
+                            
+                            
+                            
+                            
+                            
+                            
 
 
 int main (int argc, char **argv)
@@ -286,7 +423,7 @@ int main (int argc, char **argv)
   int calc_log=0;
   int calc_similarity=0;
   int calc_mweight=0;
-  int use_preselet=0;
+  int use_preselect=0;
   
   double th_m=0.95;
   double th_v=0.5;
@@ -302,8 +439,8 @@ int main (int argc, char **argv)
   static struct option long_options[] = { 
     {"clobber", no_argument, &clobber,           1},
     {"verbose", no_argument, &verbose,           1},
-    {"preselect", no_argumet, & use_preselect,   1},
-    {"no_preselect", no_argumet, &use_preselect, 0},
+    {"preselect", no_argument, &use_preselect,   1},
+    {"no_preselect", no_argument, &use_preselect, 0},
     {"mean",    no_argument, &calc_mean,   1},
     {"sd",      no_argument, &calc_sd,     1},
     {"flat",    no_argument, &flat_element,1},
@@ -411,20 +548,26 @@ int main (int argc, char **argv)
     ImageToImageFlt::Pointer filter_1,filter_2,filter_3;
     ImageToImageFlt::Pointer log_filter;
     
+    itk::Size<3> srad; srad.Fill(search);
+    itk::Size<3> prad; prad.Fill(patch);
+
+    FlatStructuringElementType  searchKernel=FlatStructuringElementType::Ball( srad );
+    FlatStructuringElementType  patchKernel =FlatStructuringElementType::Ball( prad ) ;
+    
     if( calc_sd )
     { 
       SDFilterType::Pointer flt(SDFilterType::New()); 
-      BallStructuringElementType  patchKernel;
-      patchKernel.SetRadius( patch );
-      patchKernel.CreateStructuringElement();
+      FlatStructuringElementType  patchKernel;
+      patchKernel.Ball( prad );
+      
       flt->SetKernel( patchKernel );
       flt->SetInput(img_in);
       filter=flt;
     } else if( calc_mean ) {
       MeanFilterType::Pointer flt(MeanFilterType::New()); 
-      BallStructuringElementType  patchKernel;
-      patchKernel.SetRadius( patch );
-      patchKernel.CreateStructuringElement();
+      FlatStructuringElementType  patchKernel;
+      patchKernel.Ball( prad );
+      
       flt->SetKernel( patchKernel );
       flt->SetInput(img_in);
       filter=flt;
@@ -432,15 +575,6 @@ int main (int argc, char **argv)
     } else if( calc_mdist ) {
       MeanFilterType::Pointer fltm(MeanFilterType::New()); 
       MinimalDistanceFilterType::Pointer flt(MinimalDistanceFilterType::New());
-      
-      BallStructuringElementType  searchKernel;
-      BallStructuringElementType  patchKernel;
-      
-      searchKernel.SetRadius( search );
-      searchKernel.CreateStructuringElement();
-      
-      patchKernel.SetRadius( patch );
-      patchKernel.CreateStructuringElement();
       
       fltm->SetKernel( patchKernel );
       fltm->SetInput(img_in);
@@ -463,15 +597,6 @@ int main (int argc, char **argv)
       
     } else if(calc_median){
       MedianDistanceFilterType::Pointer flt(MedianDistanceFilterType::New());
-      
-      BallStructuringElementType  searchKernel;
-      BallStructuringElementType  patchKernel;
-      
-      searchKernel.SetRadius( search );
-      searchKernel.CreateStructuringElement();
-      
-      patchKernel.SetRadius( patch );
-      patchKernel.CreateStructuringElement();
             
       flt->SetSearchKernel( searchKernel );
       flt->SetPatchKernel( patchKernel );
@@ -484,15 +609,6 @@ int main (int argc, char **argv)
       filter=flt;
     } else if(calc_similarity) {
       SimilarityFilterType::Pointer flt(SimilarityFilterType::New());
-      
-      BallStructuringElementType  searchKernel;
-      BallStructuringElementType  patchKernel;
-      
-      searchKernel.SetRadius( search );
-      searchKernel.CreateStructuringElement();
-      
-      patchKernel.SetRadius( patch );
-      patchKernel.CreateStructuringElement();
             
       flt->SetSearchKernel( searchKernel );
       flt->SetPatchKernel( patchKernel );
@@ -504,76 +620,41 @@ int main (int argc, char **argv)
         flt->SetRoiImage(roi_in);
       
       filter=flt;
-    }	else if(calc_anlm) {
+    }	else if(calc_anlm) { // running adaptative filter
     
-      BallStructuringElementType  searchKernel;
-      BallStructuringElementType  patchKernel;
+    
+        if( use_preselect )
+        {
+          filter=CreateAdaptativeNonLocalFilterWithPS<
+                  FlatStructuringElementType,
+                  itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+                  itk::InvExpWeight<double>, itk::MeanAndSdPreselectionFilter<InputImageType,FlatStructuringElementType> >
+              (search, patch, beta, anlm_regularize, img_in, roi_in, calc_mweight, flat_element, th_m, th_v);
+        } else {
+        
+          filter=CreateAdaptativeNonLocalFilter<
+                  FlatStructuringElementType,
+                  itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+                  itk::InvExpWeight<double>, itk::NOOPPreselection<3> >
+              (search, patch, beta, anlm_regularize, img_in, roi_in, calc_mweight, flat_element);
+        }
       
-      searchKernel.SetRadius( search );
-      searchKernel.CreateStructuringElement();
-      
-      patchKernel.SetRadius( patch );
-      patchKernel.CreateStructuringElement();
-      
-      AdaptativeFilterType::Pointer flt(AdaptativeFilterType::New());
-      
-      flt->SetSearchKernel( searchKernel );
-      flt->SetPatchKernel( patchKernel );
-      flt->SetInput(img_in);
-      flt->SetOutputMeanWeight(calc_mweight);
-      flt->SetBeta(beta);
-      flt->SetRegularize(anlm_regularize);
-      
-      if(!roi_f.empty())
-        flt->SetRoiImage(roi_in);
-      
-      //progress->SetMiniPipelineFilter(flt);
-      
-/*			progress->RegisterInternalFilter(fltm,.49);
-      progress->RegisterInternalFilter(sub,.01);
-      progress->RegisterInternalFilter(flt,.49);*/
-      
-      filter=flt;
     } else  { // running classic non-local patch filter
-    
-      if( flat_element )  {
-      
-        //TODO: finish
-        filter=;
-      } else {
-
-        typedef itk::ClassicalNonLocalFilter<
-                                    InputImageType,
-                                    OutputImageType,
-                                    BallStructuringElementType,
-                                    BallStructuringElementType,
-                                    itk::L2PatchDistance<InputImageType,BallStructuringElementType>,
-                                    itk::InvExpWeight<double> >  NonLocalFilterType;
-      
-        NonLocalFilterType::Pointer flt(NonLocalFilterType::New());
+        if( use_preselect )
+        {
+          filter=CreateClassicalNonLocalFilterWithPS<
+                  FlatStructuringElementType,
+                  itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+                  itk::InvExpWeight<double>, itk::MeanAndSdPreselectionFilter<InputImageType,FlatStructuringElementType> >
+              (search, patch, noise, img_in, roi_in, calc_mweight, flat_element, th_m, th_v);
+        } else {
         
-        BallStructuringElementType  searchKernel;
-        BallStructuringElementType  patchKernel;
-        
-        searchKernel.SetRadius( search );
-        searchKernel.CreateStructuringElement();
-        
-        patchKernel.SetRadius( patch );
-        patchKernel.CreateStructuringElement();
-        
-        flt->SetSearchKernel( searchKernel );
-        flt->SetPatchKernel( patchKernel );
-        flt->Setsigma2( noise*noise );
-        flt->SetInput( img_in );
-        flt->SetOutputMeanWeight( calc_mweight );
-        
-        std::cout<<"Filter:"<<flt<<std::endl;
-        
-        if(!roi_f.empty())
-          flt->SetRoiImage(roi_in);
-        
-        filter=flt;
-      }
+          filter=CreateClassicalNonLocalFilter<
+                  FlatStructuringElementType,
+                  itk::L2PatchDistance<InputImageType,FlatStructuringElementType>,
+                  itk::InvExpWeight<double>, itk::NOOPPreselection<3> >
+              (search, patch, noise, img_in, roi_in, calc_mweight, flat_element);
+        }
     }
     if(filter_1.IsNotNull())
       filter_1->AddObserver(itk::ProgressEvent(),observer);

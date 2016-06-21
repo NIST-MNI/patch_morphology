@@ -208,8 +208,8 @@ NonLocalPatchesFilter<TInputImage, TOutputImage, TSearch, TPatch, TPreselectionF
 
   os << indent << "Search Kernel: " << m_SearchKernel << std::endl;
   os << indent << "Patch Kernel: "  << m_PatchKernel  << std::endl;
-  os << indent << "Boundary condition: "  << typeid( *m_BoundaryCondition ).name() << std::endl;
-  os << indent << "Preselection filter: " << typeid( m_PreselectionFilter ).name() << std::endl;
+  //os << indent << "Boundary condition: "  << (*m_BoundaryCondition) << std::endl;
+  os << indent << "Preselection filter: " << (*m_PreselectionFilter) << std::endl;
 }
 
 }// end namespace itk
