@@ -414,7 +414,7 @@ int main (int argc, char **argv)
   int c;
   int search=2;
   int patch=1;
-  int flat_element=0;
+  int flat_element=1;
   int calc_mean=0;
   int calc_sd=0;
   int calc_mdist=0;
@@ -445,6 +445,7 @@ int main (int argc, char **argv)
     {"mean",    no_argument, &calc_mean,   1},
     {"sd",      no_argument, &calc_sd,     1},
     {"flat",    no_argument, &flat_element,1},
+    {"ball",    no_argument, &flat_element,0},
     {"float",   no_argument, &store_float, 1},
     {"short",   no_argument, &store_short, 1},
     {"byte",    no_argument, &store_byte,  1},
