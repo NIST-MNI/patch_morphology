@@ -26,11 +26,11 @@ make_phantom -ellipse \
 
 random_volume --gauss 10 $rundir/test_sphere.mnc $rundir/test_noise.mnc  --clob
 minccalc -express 'A[0]+A[1]' $rundir/test_sphere.mnc $rundir/test_noise.mnc $rundir/test_sphere_noise.mnc -clob
-$bindir/itk_minc_nonlocal_filter --sigma 10 $rundir/test_sphere_noise.mnc $rundir/test_sphere_noise_itk_nlm.mnc  --flat --clob 
-minccalc -express 'A[0]-A[1]' $rundir/test_sphere_noise_itk_nlm.mnc $rundir/test_sphere.mnc $rundir/test_sphere_noise_itk_nlm_diff.mnc -clob
+$bindir/mincnlm -sigma 10 -block 0 $rundir/test_sphere_noise.mnc $rundir/test_sphere_noise_std_nlm.mnc  -clob 
+minccalc -express 'A[0]-A[1]' $rundir/test_sphere_noise_std_nlm.mnc $rundir/test_sphere.mnc $rundir/test_sphere_noise_std_nlm_diff.mnc -clob
 
-mean=$(mincstats -q -mean   $rundir/test_sphere_noise_itk_nlm_diff.mnc)
-var=$(mincstats -q -stddev $rundir/test_sphere_noise_itk_nlm_diff.mnc)
+mean=$(mincstats -q -mean   $rundir/test_sphere_noise_std_nlm_diff.mnc)
+var=$(mincstats -q -stddev $rundir/test_sphere_noise_std_nlm_diff.mnc)
 
 check=$(bc -l <<END
 $mean>-$threshold && $mean<$threshold && $var>-$threshold && $var<$threshold
