@@ -9,6 +9,14 @@ if [ -z $rundir ];then
   exit 1 
 fi
 
+BC=$(which bc)
+
+if [ -z $BC ];then
+  echo bc is missing! >&2
+  exit 1
+fi
+
+
 echo Running nlm test
 export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
 make_phantom -ellipse \
