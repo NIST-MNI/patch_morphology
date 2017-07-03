@@ -1,5 +1,6 @@
 INCLUDE_DIRECTORIES(
   ${ITK_INCLUDE_DIRS}
+  ${OpenBLAS_INCLUDE_DIR}
   itk
   3rd_party/libsvm/
   3rd_party/nnls/
@@ -35,7 +36,7 @@ ADD_EXECUTABLE( itk_patch_grading
                 )
                 
 TARGET_LINK_LIBRARIES( itk_patch_grading  
-                ${OpenBLAS_LIBRARIES} 
+                ${OpenBLAS_LIBRARY} 
                 ${ITK_LIBRARIES} )
                 
 
@@ -46,7 +47,7 @@ ADD_EXECUTABLE(itk_patch_segmentation
                 )
 
 TARGET_LINK_LIBRARIES( itk_patch_segmentation   
-                ${OpenBLAS_LIBRARIES} 
+                ${OpenBLAS_LIBRARY} 
                 ${ITK_LIBRARIES} )
                 
                      
