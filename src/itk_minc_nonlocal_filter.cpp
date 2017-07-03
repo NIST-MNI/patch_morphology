@@ -31,6 +31,7 @@
 #include "itkAdaptativeNonLocalFilter.h"
 #include "itkNoiseMedianDistanceNonLocalFilter.h"
 #include "itkMeanWeightNonLocalFilter.h"
+#include "itkSegmentationPreselectionFilter.h"
 
 #include <unistd.h>
 #include <getopt.h>

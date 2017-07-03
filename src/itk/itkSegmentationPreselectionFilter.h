@@ -1,17 +1,3 @@
-/* ----------------------------- MNI Header -----------------------------------
-@COPYRIGHT  :
-              Copyright 2014 Vladimir Fonov, McConnell Brain Imaging Centre, 
-              Montreal Neurological Institute, McGill University.
-              The author and McGill University
-              make no representations about the suitability of this
-              software for any purpose.  It is provided "as is" without
-              express or implied warranty.
-
-              This program is free software: you can redistribute it and/or modify
-              it under the terms of the GNU General Public License as published by
-              the Free Software Foundation, either version 3 of the License, or
-              (at your option) any later version.
----------------------------------------------------------------------------- */
 #ifndef __mincSegmentationPreselectionFilter_h__
 #define __mincSegmentationPreselectionFilter_h__
 
@@ -57,6 +43,17 @@ namespace itk
     {
       return *this;
     }
+    
+    void SetThreshold(double b)
+    {
+      //NOOP
+    }
+    
+    double GetThreshold(void) 
+    {
+      return 0.0;
+    }
+    
   };
 
   template<int dim>
@@ -232,8 +229,6 @@ namespace itk
     os << "[ SegmentationMeanAndSdPreselectionFilter<TImage,TPatch> ]";
     return os;
   }
-}; //itk
+}; //minc
 
 #endif //__mincSegmentationPreselectionFilter_h__
-
-// kate: space-indent on; indent-width 2; indent-mode C++;replace-tabs on;word-wrap-column 80;show-tabs on;tab-width 2
