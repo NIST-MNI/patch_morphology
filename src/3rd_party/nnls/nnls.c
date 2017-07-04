@@ -184,7 +184,7 @@ void nnls(REAL *A, REAL *b, REAL *x, int isTransposed, int maxNNLSIters, int max
 	  LAPACKE_dgels(LAPACK_COL_MAJOR,'N', m, kCols, one, &Apt[M3(tid, 0, 0, n, m)], m, &xp[M2(tid, 0, maxmn)], m );
 #endif
 	  //Load solution xp int tx
-	  REAL minTx = HUGE;
+	  REAL minTx = HUGE_VAL;
 	  memset(&tx[M2(tid, 0, n)], 0, sizeof(REAL) * n);
 	  for(i = kCols - 1; i >= 0; --i){
 	    int kdx = kIdx[M2(tid, i, n)];
@@ -201,7 +201,7 @@ void nnls(REAL *A, REAL *b, REAL *x, int isTransposed, int maxNNLSIters, int max
 	    //Reject solution, update subproblem
 	    //Find index q in set P for negative z such that x/(x-z) is minimized
 	    //printf("Reject\n");
-	    REAL minAlpha = HUGE;
+	    REAL minAlpha = HUGE_VAL;
 	    for(i = 0; i < kCols; ++i){
 	      int kdx = kIdx[M2(tid, i, n)];
 	      if(tx[M2(tid, kdx, n)] <= 0)
@@ -486,7 +486,7 @@ void nnls_updates(REAL *A, REAL *b, REAL *x, int isTransposed,  int maxNNLSIters
 	  }
 	  
 	  //Compute solution tx	
-	  REAL minTx = HUGE;
+	  REAL minTx = HUGE_VAL;
 	  memset(&tx[M2(tid, 0, n)], 0, sizeof(REAL) * n);
 	  for(i = kCols - 1; i >= 0; --i){
 	    int kdx = kIdx[M2(tid, i, n)];
@@ -510,7 +510,7 @@ void nnls_updates(REAL *A, REAL *b, REAL *x, int isTransposed,  int maxNNLSIters
 	    //Reject solution, update subproblem
 	    //Find index q in set P for negative z such that x/(x-z) is minimized
 	    //printf("Reject\n");
-	    REAL minAlpha = HUGE;
+	    REAL minAlpha = HUGE_VAL;
 	    for(i = 0; i < kCols; ++i){
 	      int kdx = kIdx[M2(tid, i, n)];
 	      if(tx[M2(tid, kdx, n)] <= 0)
@@ -796,7 +796,7 @@ void nnls_updates_single(REAL *A, REAL *b, REAL *x, int isTransposed,  int maxNN
           }
           
           //Compute solution tx 
-          REAL minTx = HUGE;
+          REAL minTx = HUGE_VAL;
           memset(&tx[M2(tid, 0, n)], 0, sizeof(REAL) * n);
           for(i = kCols - 1; i >= 0; --i){
             int kdx = kIdx[M2(tid, i, n)];
@@ -820,7 +820,7 @@ void nnls_updates_single(REAL *A, REAL *b, REAL *x, int isTransposed,  int maxNN
             //Reject solution, update subproblem
             //Find index q in set P for negative z such that x/(x-z) is minimized
             //printf("Reject\n");
-            REAL minAlpha = HUGE;
+            REAL minAlpha = HUGE_VAL;
             for(i = 0; i < kCols; ++i){
               int kdx = kIdx[M2(tid, i, n)];
               if(tx[M2(tid, kdx, n)] <= 0)
@@ -1174,7 +1174,7 @@ void nnls2_updates_single(NNLS_HANDLE _data, REAL *A, REAL *b, REAL *x, int isTr
           }
           
           //Compute solution tx 
-          REAL minTx = HUGE;
+          REAL minTx = HUGE_VAL;
           memset(&tx[M2(tid, 0, n)], 0, sizeof(REAL) * n);
           for(i = kCols - 1; i >= 0; --i){
             int kdx = kIdx[M2(tid, i, n)];
@@ -1198,7 +1198,7 @@ void nnls2_updates_single(NNLS_HANDLE _data, REAL *A, REAL *b, REAL *x, int isTr
             //Reject solution, update subproblem
             //Find index q in set P for negative z such that x/(x-z) is minimized
             //printf("Reject\n");
-            REAL minAlpha = HUGE;
+            REAL minAlpha = HUGE_VAL;
             for(i = 0; i < kCols; ++i){
               int kdx = kIdx[M2(tid, i, n)];
               if(tx[M2(tid, kdx, n)] <= 0)
