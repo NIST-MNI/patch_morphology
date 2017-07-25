@@ -39,20 +39,17 @@ param2xfm -translation 30 0 0 $rundir/shift_x30.xfm -clob
 mincresample -nearest -transform $rundir/shift_x30.xfm -use_input $rundir/test_perfect_sphere_1.mnc $rundir/test_perfect_sphere_2.mnc -clob
 mincresample -nearest -transform $rundir/shift_x30.xfm -use_input $rundir/test_perfect_sphere_2.mnc $rundir/test_perfect_sphere_3.mnc -clob
 
-minccalc -express 'A[0]>1?1:0' -byte -label $rundir/test_perfect_sphere_1.mnc $rundir/test_perfect_sphere_1_A.mnc -clob
-minccalc -express 'A[0]>1?2:0' -byte -label $rundir/test_perfect_sphere_2.mnc $rundir/test_perfect_sphere_2_B.mnc -clob
-minccalc -express 'A[0]>1?3:0' -byte -label $rundir/test_perfect_sphere_3.mnc $rundir/test_perfect_sphere_3_C.mnc -clob
-
+#generate training "library"
+rm -f $rundir/patch_seg_library.txt
+for l in 1 2 3;do
+minccalc -express "A[0]>1?$l:0" -byte -label $rundir/test_perfect_sphere_${l}.mnc $rundir/test_perfect_sphere_${l}_lab.mnc -clob
+echo test_perfect_sphere_${l}.mnc,test_perfect_sphere_${l}_lab.mnc >>  $rundir/patch_seg_library.txt
+done
 
 random_volume --gauss 1 $rundir/test_perfect_sphere_1.mnc $rundir/test_noise_seg.mnc  --clob
 
 # generate segmentation sample with some noise
 minccalc -express 'A[0]+A[1]+A[2]+A[3]' $rundir/test_perfect_sphere_1.mnc $rundir/test_perfect_sphere_2.mnc $rundir/test_perfect_sphere_3.mnc $rundir/test_noise_seg.mnc $rundir/test_seg_sample.mnc -clob
-
-#generate training "library"
-echo test_perfect_sphere_1.mnc,test_perfect_sphere_1_A.mnc >  $rundir/patch_seg_library.txt
-echo test_perfect_sphere_2.mnc,test_perfect_sphere_2_B.mnc >> $rundir/patch_seg_library.txt
-echo test_perfect_sphere_3.mnc,test_perfect_sphere_3_C.mnc >> $rundir/patch_seg_library.txt
 
 # run patch-based segmentation with 4 classes: BG A B C
 $bindir/itk_patch_segmentation  \
@@ -64,7 +61,7 @@ $bindir/itk_patch_segmentation  \
     $rundir/patch_seg_labs_new.mnc \
     --clob --verbose 
 
-itk_patch_morphology \
+$bindir/itk_patch_morphology \
     --train $rundir/patch_seg_library.txt  \
     --patch 1 --search 1 --threshold 0.0 \
     --discrete 4 \
@@ -73,6 +70,26 @@ itk_patch_morphology \
     $rundir/patch_seg_labs.mnc \
     --clob  --verbose 
 
+$bindir/itk_split_labels $rundir/patch_seg_labs_new.mnc \
+ $rundir/patch_seg_labs_new_split_%d.mnc --byte 
 
+$bindir/itk_split_labels $rundir/patch_seg_labs.mnc \
+ $rundir/patch_seg_labs_split_%d.mnc --byte 
+
+
+for l in 1 2 3;do
+    minccalc -label -express "A[0]-A[1]*$l" $rundir/test_perfect_sphere_${l}_lab.mnc $rundir/patch_seg_labs_new_split_$l.mnc $rundir/patch_seg_labs_new_diff_$l.mnc -clob
+    minccalc -label -express "A[0]-A[1]*$l" $rundir/test_perfect_sphere_${l}_lab.mnc $rundir/patch_seg_labs_split_$l.mnc $rundir/patch_seg_labs_diff_$l.mnc -clob
     
+    v=$(mincstats -q -sum $rundir/patch_seg_labs_new_diff_$l.mnc)
+    if [ "$v" != "0" ];then
+        echo "There is a difference in the output , check $rundir/test_perfect_sphere_${l}_lab.mnc $rundir/patch_seg_labs_new_split_$l.mnc"
+        exit 1
+    fi
     
+    v=$(mincstats -q -sum $rundir/patch_seg_labs_diff_$l.mnc)
+    if [ "$v" != "0" ];then
+        echo "There is a difference in the output , check $rundir/test_perfect_sphere_${l}_lab.mnc $rundir/patch_seg_labs_split_$l.mnc"
+        exit 1
+    fi
+done
