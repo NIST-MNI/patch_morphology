@@ -35,8 +35,8 @@ ADD_EXECUTABLE( itk_patch_grading
                 3rd_party/nnls/nnls.c
                 )
                 
-TARGET_LINK_LIBRARIES( itk_patch_grading  
-                ${OpenBLAS_LIBRARY} 
+TARGET_LINK_LIBRARIES( itk_patch_grading
+                ${OpenBLAS_LIBRARY}
                 ${ITK_LIBRARIES} )
                 
 
@@ -46,11 +46,12 @@ ADD_EXECUTABLE(itk_patch_segmentation
                 3rd_party/nnls/nnls.c
                 )
 
-TARGET_LINK_LIBRARIES( itk_patch_segmentation   
+TARGET_LINK_LIBRARIES( itk_patch_segmentation
                 ${OpenBLAS_LIBRARY} 
                 ${ITK_LIBRARIES} )
-                
-                     
+
+
+
 # Experimantal stuff
 # ADD_EXECUTABLE(itk_levelset_segment 
 #                 itk_levelset_segment.cpp )
