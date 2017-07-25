@@ -51,7 +51,28 @@ TARGET_LINK_LIBRARIES( itk_patch_segmentation
                 ${ITK_LIBRARIES} )
 
 
+                
+ADD_EXECUTABLE(itk_split_labels 
+                itk_split_labels.cpp
+                )
 
+TARGET_LINK_LIBRARIES( itk_split_labels
+                ${ITK_LIBRARIES} )
+                
+ADD_EXECUTABLE( itk_merge_labels
+                itk_merge_labels.cpp
+                )
+
+TARGET_LINK_LIBRARIES( itk_merge_labels
+                ${ITK_LIBRARIES} )
+ 
+ADD_EXECUTABLE( itk_merge_discrete_labels
+                itk_merge_discrete_labels.cpp
+                )
+
+TARGET_LINK_LIBRARIES( itk_merge_discrete_labels
+                ${ITK_LIBRARIES} )
+                
 # Experimantal stuff
 # ADD_EXECUTABLE(itk_levelset_segment 
 #                 itk_levelset_segment.cpp )
@@ -74,4 +95,7 @@ INSTALL(TARGETS
          itk_minc_nonlocal_filter 
          itk_patch_grading 
          itk_patch_segmentation
+         itk_split_labels
+         itk_merge_labels
+         itk_merge_discrete_labels
         RUNTIME DESTINATION bin )

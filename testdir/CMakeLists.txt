@@ -13,3 +13,4 @@ ENDMACRO(ADD_MINC_TEST)
 
 ADD_MINC_TEST(test_nlm  test_nlm.sh )
 ADD_MINC_TEST(test_anlm test_anlm.sh )
+ADD_MINC_TEST(test_patch_segmentation test_segmentation.sh )
