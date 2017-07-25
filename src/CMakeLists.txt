@@ -8,21 +8,21 @@ INCLUDE_DIRECTORIES(
 
 LINK_DIRECTORIES( ${ITK_LIBRARY_DIRS} )
   
-ADD_EXECUTABLE(itk_patch_morphology
+ADD_EXECUTABLE( itk_patch_morphology
                 itk_patch_morphology.cpp )
 
 TARGET_LINK_LIBRARIES( itk_patch_morphology   
                       ${ITK_LIBRARIES} 
                       )
 
-ADD_EXECUTABLE(itk_patch_morphology_mc
+ADD_EXECUTABLE( itk_patch_morphology_mc
                 itk_patch_morphology_mc.cpp )
 
 TARGET_LINK_LIBRARIES( itk_patch_morphology_mc 
                       ${ITK_LIBRARIES} 
                       )
 
-ADD_EXECUTABLE(itk_minc_nonlocal_filter 
+ADD_EXECUTABLE( itk_minc_nonlocal_filter 
                 itk_minc_nonlocal_filter.cpp )
 
 TARGET_LINK_LIBRARIES( itk_minc_nonlocal_filter  
@@ -40,7 +40,7 @@ TARGET_LINK_LIBRARIES( itk_patch_grading
                 ${ITK_LIBRARIES} )
                 
 
-ADD_EXECUTABLE(itk_patch_segmentation
+ADD_EXECUTABLE( itk_patch_segmentation
                 itk_patch_segmentation.cpp
                 3rd_party/libsvm/svm.cpp
                 3rd_party/nnls/nnls.c
@@ -50,9 +50,7 @@ TARGET_LINK_LIBRARIES( itk_patch_segmentation
                 ${OpenBLAS_LIBRARY} 
                 ${ITK_LIBRARIES} )
 
-
-                
-ADD_EXECUTABLE(itk_split_labels 
+ADD_EXECUTABLE( itk_split_labels 
                 itk_split_labels.cpp
                 )
 
@@ -87,15 +85,13 @@ TARGET_LINK_LIBRARIES( itk_merge_discrete_labels
 #                      ${ITK_LIBRARIES} 
 #          )
 
-
-
 INSTALL(TARGETS 
-         itk_patch_morphology 
-         itk_patch_morphology_mc 
-         itk_minc_nonlocal_filter 
-         itk_patch_grading 
-         itk_patch_segmentation
-         itk_split_labels
-         itk_merge_labels
-         itk_merge_discrete_labels
+    itk_patch_morphology 
+    itk_patch_morphology_mc 
+    itk_minc_nonlocal_filter 
+    itk_patch_grading 
+    itk_patch_segmentation
+    itk_split_labels
+    itk_merge_labels
+    itk_merge_discrete_labels
         RUNTIME DESTINATION bin )
