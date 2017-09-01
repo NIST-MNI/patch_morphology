@@ -11,6 +11,7 @@ MACRO(ADD_MINC_TEST name command )
  ENDIF(MINC_TEST_ENVIRONMENT)
 ENDMACRO(ADD_MINC_TEST)
 
+
 ADD_MINC_TEST(test_nlm  test_nlm.sh )
 ADD_MINC_TEST(test_anlm test_anlm.sh )
 

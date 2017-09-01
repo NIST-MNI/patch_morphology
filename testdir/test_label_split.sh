@@ -1,5 +1,5 @@
 #! /bin/bash
-set -e
+set -e 
 
 bindir=$1
 rundir=$2
@@ -38,11 +38,11 @@ mincresample -nearest -transform $rundir/shift_x30.xfm -use_input $rundir/test_p
 mincresample -nearest -transform $rundir/shift_x30.xfm -use_input $rundir/test_perfect_sphere_2.mnc $rundir/test_perfect_sphere_3.mnc -clob
 
 for l in 1 2 3;do
-    minccalc -express "A[0]>1?$l:0" -byte -label $rundir/test_perfect_sphere_$l.mnc $rundir/test_perfect_sphere_lab_$l.mnc -clob
+    minccalc -labels -express "A[0]>0.5?$l:0" -byte $rundir/test_perfect_sphere_$l.mnc $rundir/test_perfect_sphere_lab_$l.mnc -clob
 done
 
 # generate segmentation with multiple labels
-minccalc -byte -label -express 'A[0]+A[1]+A[2]' \
+minccalc -byte -labels -express 'A[0]+A[1]+A[2]' \
     $rundir/test_perfect_sphere_lab_1.mnc \
     $rundir/test_perfect_sphere_lab_2.mnc \
     $rundir/test_perfect_sphere_lab_3.mnc \
