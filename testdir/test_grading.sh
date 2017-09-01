@@ -18,7 +18,7 @@ if [ -z $BC ];then
   exit 1
 fi
 
-echo Running patch-based segmentation test
+echo Running patch-based grading test
 export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
 
 make_phantom -ellipse \
@@ -32,18 +32,18 @@ make_phantom -ellipse \
              -width 10 10 10 \
              -clob \
              -center -30 0 0  \
-             $rundir/test_perfect_sphere_1.mnc
+             $rundir/grad_test_perfect_sphere_1.mnc
 
-param2xfm -translation 30 0 0 $rundir/shift_x30.xfm -clob
+param2xfm -translation 30 0 0 $rundir/grad_shift_x30.xfm -clob
 
-mincresample -nearest -transform $rundir/shift_x30.xfm -use_input $rundir/test_perfect_sphere_1.mnc $rundir/test_perfect_sphere_2.mnc -clob
-mincresample -nearest -transform $rundir/shift_x30.xfm -use_input $rundir/test_perfect_sphere_2.mnc $rundir/test_perfect_sphere_3.mnc -clob
+mincresample -nearest -transform $rundir/grad_shift_x30.xfm -use_input $rundir/grad_test_perfect_sphere_1.mnc $rundir/grad_test_perfect_sphere_2.mnc -clob
+mincresample -nearest -transform $rundir/grad_shift_x30.xfm -use_input $rundir/grad_test_perfect_sphere_2.mnc $rundir/grad_test_perfect_sphere_3.mnc -clob
 
 #generate training "library"
-rm -f $rundir/patch_seg_library.txt
+rm -f $rundir/patch_grad_library.txt
 for l in 1 2 3;do
-minccalc -express "A[0]>1?$l:0" -byte -labels $rundir/test_perfect_sphere_${l}.mnc $rundir/test_perfect_sphere_${l}_lab.mnc -clob
-echo test_perfect_sphere_${l}.mnc,test_perfect_sphere_${l}_lab.mnc >>  $rundir/patch_seg_library.txt
+minccalc -express "A[0]>1?$l:0" -byte -labels $rundir/grad_test_perfect_sphere_${l}.mnc $rundir/grad_test_perfect_sphere_${l}_lab.mnc -clob
+echo grad_test_perfect_sphere_${l}.mnc,grad_test_perfect_sphere_${l}_lab.mnc >>  $rundir/patch_grade_library.txt
 done
 
 random_volume --gauss 1 $rundir/test_perfect_sphere_1.mnc $rundir/test_noise_seg.mnc  --clob
@@ -51,8 +51,8 @@ random_volume --gauss 1 $rundir/test_perfect_sphere_1.mnc $rundir/test_noise_seg
 # generate segmentation sample with some noise
 minccalc -express 'A[0]+A[1]+A[2]+A[3]' $rundir/test_perfect_sphere_1.mnc $rundir/test_perfect_sphere_2.mnc $rundir/test_perfect_sphere_3.mnc $rundir/test_noise_seg.mnc $rundir/test_seg_sample.mnc -clob
 
-# run patch-based grading 
-$bindir/itk_patch_segmentation  \
+# run patch-based segmentation with 4 classes: BG A B C
+$bindir/itk_patch_grading  \
     --exp \
     --train $rundir/patch_seg_library.txt  \
     --patch 1 --search 1 --threshold 0.0 --discrete 4 \
