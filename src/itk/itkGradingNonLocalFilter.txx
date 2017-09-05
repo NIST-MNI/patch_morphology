@@ -356,7 +356,7 @@ GradingNonLocalFilter<TFeatureImage,TLabelImage,TOutputImage,TSearch,TPatch,TReg
       
       _regressor->start_new_regression();
       _regressor->set_input(patch_iter,patchKernelBegin, patchKernelEnd);
-      labels_present.clear();
+      //labels_present.clear();
       //Iterate through all library samples and find distances
       for(size_t sample=0;sample<library_size;sample++)
       {
@@ -385,7 +385,7 @@ GradingNonLocalFilter<TFeatureImage,TLabelImage,TOutputImage,TSearch,TPatch,TReg
             if(!preselection_filter->select( patch_iter.GetIndex(),sample,patch_iterators[sample].GetIndex())) 
               continue;
               
-            labels_present.insert(search_iterators[sample].GetPixel(i));
+            //labels_present.insert(search_iterators[sample].GetPixel(i));
             
             _regressor->add_training_sample(search_iterators[sample].GetPixel(i), // label or sample_grading
                                             sample_grading,
@@ -404,23 +404,12 @@ GradingNonLocalFilter<TFeatureImage,TLabelImage,TOutputImage,TSearch,TPatch,TReg
       double grading=0;
       prob.assign(m_LabelCount,0.0);
       
-      //TODO: make sure we are not trying to grade here!!!!!
-      if(labels_present.size()<2)
+      if(!_regressor->regress(output, confidence, prob, grading))
       {
-        output=*labels_present.begin();
-        confidence=1;
-        grading=-1;
-        prob[output]=1.0;
-      } else {
-        if(!_regressor->regress(output,confidence,prob,grading))
-        {
-          //TODO: store information that regression failed on this voxel, somehow....
-          output=0;
-          confidence=0;
-          
-        }
+        //TODO: store information that regression failed on this voxel, somehow....
+        output=0;
+        confidence=0;
       }
-      //grading=labels_present.size();
       
       o_iter.Set( output );
       conf_iter.Set( confidence );

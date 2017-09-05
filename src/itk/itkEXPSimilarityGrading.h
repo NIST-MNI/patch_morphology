@@ -53,8 +53,11 @@ namespace itk
     std::vector<double> _b;
     std::vector<double> _x;
     std::vector<double> _label_weight;
+    std::vector<double> _label_grade;
     std::vector<int>    _labels;
     std::vector<int>    _label_hist;
+    std::vector<double> _grades;
+    
     int                 _sample;
     size_t              _sample_size,_feature_size,_label_cnt;
     int                 _most_common_label;
@@ -98,7 +101,8 @@ namespace itk
     
     void allocate_memory(size_t sample_size, 
                          size_t feature_size,
-                         size_t label_cnt, TDistance distance_op=TDistance())
+                         size_t label_cnt, 
+                         TDistance distance_op=TDistance())
     {
       cleanup();
       //need to copy for a potential multi-threading operation
@@ -113,8 +117,10 @@ namespace itk
       _x.resize(sample_size);
       
       _labels.resize(sample_size);
+      _grades.resize(sample_size);
       
       _label_weight.resize(label_cnt);
+      _label_grade.resize(label_cnt);
       _label_hist.resize(label_cnt);
     }
     
@@ -169,9 +175,11 @@ namespace itk
 //       
 //       if(label<0          ) abort();
 //       if(label>=_label_cnt) abort();
+//       _label_hist[label]++;
       
       _labels[_sample]=label;
-//       _label_hist[label]++;
+      _grades[_sample]=grading;
+      
       double *__A=&_A[ _sample*_feature_size ];
       for( kernel_it=patchKernelBegin; kernel_it<patchKernelEnd; ++kernel_it, ++i )
       {
@@ -191,6 +199,7 @@ namespace itk
       const double _epsilon=1e-4;      
       
       _label_weight.assign(_label_cnt,0.0);
+      _label_grade.assign(_label_cnt,0.0);
       double total_weight=0.0;
       double min_distance=1e10;
       //double avg_dist=0.0;
@@ -205,12 +214,14 @@ namespace itk
       //avg_dist/=_sample_size;
       
       if(min_distance<_epsilon) min_distance=_epsilon;
+      
       //TODO: make inverse exponent another template class?
       for(size_t k=0;k<_sample_size;k++)
       {
         double w=exp(-_x[k]/(2.0*min_distance*_beta));
         total_weight+=w;
         _label_weight[_labels[k]]+=w;
+        _label_grade[_labels[k]]+=w*_grades[k];
       }
       
       double max_weight=0.0;
@@ -219,6 +230,8 @@ namespace itk
       for(size_t k=0;k<_label_cnt;k++)
       {
         _label_weight[k]/=total_weight;
+        _label_grade[k]/=total_weight;
+        
         if(_label_weight[k]>max_weight || k==0)
         {
           max_weight=_label_weight[k];
@@ -226,10 +239,10 @@ namespace itk
         }
         prob[k]=_label_weight[k];
       }
-
-      label   = chosen_label;
-      grading = max_weight;
+      //assign grading of the most probable label 
       
+      grading =_label_grade[chosen_label];
+      label   = chosen_label;
       return true;
     }
 

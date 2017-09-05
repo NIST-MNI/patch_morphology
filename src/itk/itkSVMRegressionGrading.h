@@ -9,6 +9,7 @@
 
 namespace itk
 {
+  //WIP: grading is not working yet!
   template<class TImage,class TPatch> class SVMRegressionGrading: public itk::LightObject
   {
   public:
