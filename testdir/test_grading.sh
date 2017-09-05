@@ -126,28 +126,20 @@ itk_label_stats $rundir/patch_grad_labs_new.mnc --volume $rundir/patch_grad_new.
 itk_label_stats $rundir/patch_grad_labs.mnc --volume $rundir/patch_grad.mnc > $rundir/grading_label_stats.csv
 
 # ground truth for volumes of labels:
-cat - >$rundir/grading_label_vol.csv <<END
-id,volume,mx,my,mz
-1,936,-30,0,0
-2,936,0,0,0
-3,936,30,0,0
+cat - >$rundir/grading_truth.csv <<END
+id,volume,mx,my,mz,val
+1,936,-30,0,0,1
+2,936,0,0,0,0
+3,936,30,0,0,0
 END
 
-cut -d , -f 1-5 $rundir/grading_label_stats_new.csv > $rundir/grading_label_stats_new_vol.csv
-cut -d , -f 1-5 $rundir/grading_label_stats.csv    >  $rundir/grading_label_stats_vol.csv
-
-
-if ! diff -q $rundir/grading_label_stats_new_vol.csv $rundir/grading_label_vol.csv;then
+if ! diff -q $rundir/grading_label_stats_new.csv $rundir/grading_truth.csv;then
 echo "Unexpected values in $rundir/grading_label_stats_new.csv"
 exit 1
 fi
 
-if ! diff -q $rundir/grading_label_stats_vol.csv $rundir/grading_label_vol.csv;then
+if ! diff -q $rundir/grading_label_stats.csv $rundir/grading_truth.csv;then
 echo "Unexpected values in $rundir/grading_label_stats.csv"
 exit 1
 fi
-
-# 1st label should grading be around 1 and the rest 0  
-
-
 
