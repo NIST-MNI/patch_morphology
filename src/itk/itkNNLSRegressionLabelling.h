@@ -5,7 +5,12 @@
 #include <vector>
 #include <algorithm>
 #include <itkLightObject.h>
+
+#ifdef HAVE_OPENBLAS
 #include "nnls.h"
+#else
+#define NNLS_HANDLE void *
+#endif
 
 namespace itk
 {
@@ -52,8 +57,10 @@ namespace itk
     
     void cleanup(void)
     {
+#ifdef HAVE_OPENBLAS      
       if(NNLS_work)
         free_nnls(NNLS_work);
+#endif      
       NNLS_work=NULL;
     }
 
@@ -84,8 +91,12 @@ namespace itk
       labels.resize(sample_size);
       
       label_weight.resize(label_cnt);
-      
+#ifdef HAVE_OPENBLAS
       NNLS_work=allocate_nnls(1,_feature_size, _sample_size);
+#else
+      fprintf(stderr,"Compiled without OpenBLAS, NNLS not implemented\n");
+      abort();
+#endif
     }
     
     
@@ -151,9 +162,11 @@ namespace itk
     
     bool regress(int &label,double &confidence,std::vector<double> &prob,double &grading)
     {
+#ifdef HAVE_OPENBLAS      
       nnls2_updates_single(NNLS_work,&NNLS_A[0], &NNLS_b[0], &NNLS_x[0], 0, 
                    (_feature_size+_sample_size)*2, (_feature_size+_sample_size)*2, 1,  
                    _feature_size, _sample_size, 1e-20);      
+#endif
 
       label_weight.assign(_label_cnt,0.0);
       double total_weight=0.0;

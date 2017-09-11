@@ -3,8 +3,13 @@ INCLUDE_DIRECTORIES(
   ${OpenBLAS_INCLUDE_DIR}
   itk
   3rd_party/libsvm/
-  3rd_party/nnls/
   )
+
+IF(HAVE_OPENBLAS)
+  INCLUDE_DIRECTORIES(
+    3rd_party/nnls/
+  )
+ENDIF(HAVE_OPENBLAS)
 
 LINK_DIRECTORIES( ${ITK_LIBRARY_DIRS} )
   
@@ -29,26 +34,45 @@ TARGET_LINK_LIBRARIES( itk_minc_nonlocal_filter
                       ${ITK_LIBRARIES} 
                      )
 
-ADD_EXECUTABLE( itk_patch_grading
+SET(  itk_patch_grading_SRC
                 itk_patch_grading.cpp
                 3rd_party/libsvm/svm.cpp
-                3rd_party/nnls/nnls.c
                 )
-                
+
+IF(HAVE_OPENBLAS)
+  SET(itk_patch_grading_SRC ${itk_patch_grading_SRC} 3rd_party/nnls/nnls.c) # NOT implemented anyway
+ENDIF(HAVE_OPENBLAS)
+
+
+ADD_EXECUTABLE( itk_patch_grading ${itk_patch_grading_SRC})
+
 TARGET_LINK_LIBRARIES( itk_patch_grading
-                ${OpenBLAS_LIBRARY}
                 ${ITK_LIBRARIES} )
                 
+IF(HAVE_OPENBLAS)
+  TARGET_LINK_LIBRARIES( itk_patch_grading
+                  ${OpenBLAS_LIBRARY} )
+ENDIF(HAVE_OPENBLAS)
 
-ADD_EXECUTABLE( itk_patch_segmentation
+SET( itk_patch_segmentation_SRC
                 itk_patch_segmentation.cpp
                 3rd_party/libsvm/svm.cpp
-                3rd_party/nnls/nnls.c
                 )
+                
+IF(HAVE_OPENBLAS)
+  SET(itk_patch_grading_SRC ${itk_patch_grading_SRC} 3rd_party/nnls/nnls.c)
+ENDIF(HAVE_OPENBLAS)
+
+ADD_EXECUTABLE( itk_patch_segmentation ${itk_patch_segmentation_SRC})
 
 TARGET_LINK_LIBRARIES( itk_patch_segmentation
-                ${OpenBLAS_LIBRARY} 
                 ${ITK_LIBRARIES} )
+                
+IF(HAVE_OPENBLAS)
+  TARGET_LINK_LIBRARIES( itk_patch_segmentation
+                  ${OpenBLAS_LIBRARY} )
+ENDIF(HAVE_OPENBLAS)
+                
 
 ADD_EXECUTABLE( itk_split_labels 
                 itk_split_labels.cpp
