@@ -60,7 +60,7 @@ SET( itk_patch_segmentation_SRC
                 )
                 
 IF(HAVE_OPENBLAS)
-  SET(itk_patch_grading_SRC ${itk_patch_grading_SRC} 3rd_party/nnls/nnls.c)
+  SET(itk_patch_segmentation_SRC ${itk_patch_grading_SRC} 3rd_party/nnls/nnls.c)
 ENDIF(HAVE_OPENBLAS)
 
 ADD_EXECUTABLE( itk_patch_segmentation ${itk_patch_segmentation_SRC})
