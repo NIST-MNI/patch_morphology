@@ -21,6 +21,9 @@ fi
 echo Running patch-based grading test
 export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
 
+# force working with V2 minc files
+export MINC_FORCE_V2=1
+
 make_phantom -ellipse \
              -continuous -short \
              -start -50 -50 -50 \
