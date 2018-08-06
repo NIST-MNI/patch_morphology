@@ -1,12 +1,12 @@
 INCLUDE_DIRECTORIES(
   ${ITK_INCLUDE_DIRS}
-  ${OpenBLAS_INCLUDE_DIR}
   itk
   3rd_party/libsvm/
   )
 
 IF(HAVE_OPENBLAS)
   INCLUDE_DIRECTORIES(
+    ${OpenBLAS_INCLUDE_DIRS}
     3rd_party/nnls/
   )
 ENDIF(HAVE_OPENBLAS)
@@ -51,7 +51,7 @@ TARGET_LINK_LIBRARIES( itk_patch_grading
                 
 IF(HAVE_OPENBLAS)
   TARGET_LINK_LIBRARIES( itk_patch_grading
-                  ${OpenBLAS_LIBRARY} )
+                  ${OpenBLAS_LIBRARIES} )
 ENDIF(HAVE_OPENBLAS)
 
 SET( itk_patch_segmentation_SRC
@@ -70,7 +70,7 @@ TARGET_LINK_LIBRARIES( itk_patch_segmentation
                 
 IF(HAVE_OPENBLAS)
   TARGET_LINK_LIBRARIES( itk_patch_segmentation
-                  ${OpenBLAS_LIBRARY} )
+                  ${OpenBLAS_LIBRARIES} )
 ENDIF(HAVE_OPENBLAS)
                 
 
