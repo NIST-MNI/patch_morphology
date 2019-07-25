@@ -55,6 +55,7 @@
 #include <itkImageIOBase.h>
 
 #include <vnl/vnl_cross.h>
+#include <vnl/vnl_math.h>
 
 #include "itkHelpers.h"
 
@@ -245,7 +246,7 @@ void resample_label_image (
   //this is for processing using batch system
   filter->SetNumberOfThreads(1);
 
-  typename Image::Pointer like=0;
+  typename Image::Pointer like=nullptr;
 
   if(uniformize!=0.0)
   {
@@ -270,7 +271,7 @@ void resample_label_image (
   {
     InputPixelType val = it.Get();
 
-    if(vnl_math_isfinite(val))
+    if(isfinite(val))
       sval.insert(val);
   }
 

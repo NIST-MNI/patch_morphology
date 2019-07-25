@@ -133,7 +133,7 @@ void assemble_image (const std::vector<std::string>& input_f,
     {
       typename Image::PixelType val =      it_in.Get();
       typename Image::PixelType val_max = it_max.Get();
-      if(label_it == sval.begin() || vnl_math_isfinite(val) && val>val_max)
+      if(label_it == sval.begin() || isfinite(val) && val>val_max)
       {
         it_max.Set(val);
         it_out.Set(*label_it);

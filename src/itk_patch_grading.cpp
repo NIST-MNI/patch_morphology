@@ -395,8 +395,8 @@ run_grading(int search_radius,
 {
 
   
-  StructuringElementType::RadiusType   search_radius_={{search_radius,search_radius,search_radius}};
-  StructuringElementType::RadiusType   patch_radius_={{patch_radius,patch_radius,patch_radius}};
+  StructuringElementType::RadiusType   search_radius_;search_radius_.assign(search_radius);//={{search_radius,search_radius,search_radius}};
+  StructuringElementType::RadiusType   patch_radius_;patch_radius_.assign(patch_radius);//={{patch_radius,patch_radius,patch_radius}};
 
   StructuringElementType  searchKernel=ball_structuring_element?StructuringElementType::Box(search_radius_):StructuringElementType::Ball(search_radius_);
   StructuringElementType  patchKernel =ball_structuring_element?StructuringElementType::Box(patch_radius_):StructuringElementType::Ball(patch_radius_);
@@ -448,7 +448,7 @@ run_grading(int search_radius,
       
       search_radius++;
       
-      StructuringElementType::RadiusType search_radius_={search_radius,search_radius,search_radius};
+      StructuringElementType::RadiusType search_radius_;search_radius_.assign(search_radius);//={search_radius,search_radius,search_radius};
       searchKernel=ball_structuring_element?StructuringElementType::Box(search_radius_):StructuringElementType::Ball(search_radius_);
       
     } while(iter<max_iterations && filter->GetNonConfidentVoxels()>0);
@@ -974,7 +974,7 @@ int main ( int argc,char **argv )
     
     if(preselect_threshold>0.0)
     {
-      StructuringElementType::RadiusType   patch_radius_={{patch_radius,patch_radius,patch_radius}};
+      StructuringElementType::RadiusType   patch_radius_;patch_radius_.assign(patch_radius);//={{patch_radius,patch_radius,patch_radius}};
       StructuringElementType  patchKernel =ball_structuring_element?StructuringElementType::Box(patch_radius_):StructuringElementType::Ball(patch_radius_);
       MeanAndSdPreselectionType::Pointer   preselection=MeanAndSdPreselectionType::New();
       preselection->SetThreshold(preselect_threshold);

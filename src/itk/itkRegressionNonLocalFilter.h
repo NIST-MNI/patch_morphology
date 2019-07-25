@@ -262,13 +262,13 @@ class  RegressionNonLocalFilter :
     ~RegressionNonLocalFilter() {};
 
     /** prepare before starting the thread */
-    void BeforeThreadedGenerateData(void);
+    void BeforeThreadedGenerateData(void) override;
 
     /** Multi-thread version GenerateData. */
     void  ThreadedGenerateData (const OutputImageRegionType& outputRegionForThread,
-                                itk::ThreadIdType threadId);
+                                itk::ThreadIdType threadId) override;
     /** finish calculations */
-    void AfterThreadedGenerateData(void);
+    void AfterThreadedGenerateData(void) override;
     
     
 

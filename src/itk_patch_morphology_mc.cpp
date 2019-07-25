@@ -796,11 +796,9 @@ int main ( int argc,char **argv )
               <<"\tUsing "<<(ball_structuring_element?"Ball":"Box")<<" structural element"<<std::endl;
 
 
-    StructuringElementType::RadiusType search_radius_=
-      {{search_radius,search_radius,search_radius}};
+    StructuringElementType::RadiusType search_radius_;search_radius_.assign(search_radius);//={{search_radius,search_radius,search_radius}};
       
-    StructuringElementType::RadiusType patch_radius_=
-      {{patch_radius,patch_radius,patch_radius}};
+    StructuringElementType::RadiusType patch_radius_;patch_radius_.assign(patch_radius);//      {{patch_radius,patch_radius,patch_radius}};
 
     StructuringElementType  searchKernel=
       ball_structuring_element?StructuringElementType::Box(search_radius_):StructuringElementType::Ball(search_radius_);

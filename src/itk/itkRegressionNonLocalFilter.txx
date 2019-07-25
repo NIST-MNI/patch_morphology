@@ -211,8 +211,11 @@ template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearc
 void
 RegressionNonLocalFilter<TFeatureImage,TLabelImage,TOutputImage,TSearch,TPatch,TRegressor,TPreselectionFilter,TRealType>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                      itk::ThreadIdType threadId) 
+                      itk::ThreadIdType threadId)
 {
+  // disable dynamic multithreading
+  this->DynamicMultiThreadingOff();
+  
   // clone regressor , because it's not thread safe
   RegressorPointer _regressor=m_Regressor->clone();
 
