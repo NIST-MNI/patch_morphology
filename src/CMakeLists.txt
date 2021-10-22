@@ -4,7 +4,7 @@ INCLUDE_DIRECTORIES(
   3rd_party/libsvm/
   )
 
-IF(HAVE_OPENBLAS)
+IF(HAVE_OPENBLAS) # TODO: make this generic for any BLAS
   INCLUDE_DIRECTORIES(
     ${OpenBLAS_INCLUDE_DIRS}
     3rd_party/nnls/

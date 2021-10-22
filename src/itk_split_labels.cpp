@@ -28,7 +28,9 @@
 #include <limits>
 #include <unistd.h>
 #include <algorithm>
+
 #include <stdlib.h>
+#include <math.h>
 
 #include <itkVector.h>
 #include <itkResampleImageFilter.h>
@@ -245,7 +247,7 @@ void resample_label_image (
   //this is for processing using batch system
   filter->SetNumberOfThreads(1);
 
-  typename Image::Pointer like=0;
+  typename Image::Pointer like=nullptr;
 
   if(uniformize!=0.0)
   {
@@ -270,7 +272,7 @@ void resample_label_image (
   {
     InputPixelType val = it.Get();
 
-    if(vnl_math_isfinite(val))
+    if(isfinite(val))
       sval.insert(val);
   }
 

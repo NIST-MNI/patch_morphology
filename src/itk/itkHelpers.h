@@ -17,9 +17,15 @@
 
 #include <itkMetaDataObject.h>
 #include <itkImage.h>
-#include <itkExceptionObject.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
+
+#if (ITK_VERSION_MAJOR < 5)
+#include <itkExceptionObject.h>
+#else
+#include <itkMacro.h>
+#endif
+
 
 
 #include <stdlib.h>
