@@ -17,7 +17,7 @@
 
 #include <itkMetaDataObject.h>
 #include <itkImage.h>
-#include <itkExceptionObject.h>
+#include <itkMacro.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 
