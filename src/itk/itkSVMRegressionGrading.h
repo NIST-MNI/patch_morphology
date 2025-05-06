@@ -14,7 +14,7 @@ namespace itk
   {
   public:
     typedef SVMRegressionGrading Self;
-    itkTypeMacro(L1PatchDistance, itk::LightObject);    
+    itkTypeMacro(SVMRegressionGrading, itk::LightObject);    
     typedef itk::SmartPointer<Self>        Pointer;
     typedef itk::SmartPointer<const Self>  ConstPointer;
     itkNewMacro(Self);

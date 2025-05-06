@@ -35,7 +35,7 @@ public:
   itkNewMacro(Self);  
 
   /** Runtime information support. */
-  itkTypeMacro(GrayscaleDilateImageFilter, 
+  itkTypeMacro(LocalSDFilter, 
                MorphologyImageFilter);
   
   /** Declaration of pixel type. */
