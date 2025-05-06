@@ -18,7 +18,7 @@ namespace itk
   {
   public:
     typedef NNLSRegressionLabelling Self;
-    itkTypeMacro(L1PatchDistance, itk::LightObject);    
+    itkTypeMacro(NNLSRegressionLabelling, itk::LightObject);    
     typedef itk::SmartPointer<Self>        Pointer;
     typedef itk::SmartPointer<const Self>  ConstPointer;
     itkNewMacro(Self);

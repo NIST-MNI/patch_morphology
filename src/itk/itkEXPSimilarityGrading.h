@@ -37,7 +37,7 @@ namespace itk
   {
   public:
     typedef ExpSimilarityGrading Self;
-    itkTypeMacro(L1PatchDistance, itk::LightObject);
+    itkTypeMacro(ExpSimilarityGrading, itk::LightObject);
     typedef itk::SmartPointer<Self>        Pointer;
     typedef itk::SmartPointer<const Self>  ConstPointer;
     itkNewMacro(Self);
