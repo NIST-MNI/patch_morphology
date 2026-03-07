@@ -10,6 +10,7 @@ template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearc
   std::ostream & operator<<(std::ostream &os, const typename GradingNonLocalFilter<TFeatureImage, TLabelImage, TOutputImage, TSearch, TRegressor, TPreselectionFilter, TRealType>::SegmentationLibraryType &s)
   {
     os<< " [ GradingLibraryType , size="<<s.size()<<" ]";
+    return os;
   }
   
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch, class TPatch,class TRegressor,class TPreselectionFilter,class TRealType>

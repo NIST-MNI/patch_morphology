@@ -23,6 +23,7 @@ template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearc
   std::ostream & operator<<(std::ostream &os, const typename SegmentationNonLocalFilter<TFeatureImage,TLabelImage, TOutputImage, TSearch, TPatch,SampleProcess, TDistance,TPreselectionFilter,TRealType>::SegmentationLibraryType &s)
   {
     os<< " [ SegmentationLibraryType , size="<<s.size()<<" ]";
+    return os;
   }
   
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch, class TPatch,class SampleProcess,class TDistance,class TPreselectionFilter,class TRealType>

@@ -10,6 +10,7 @@ template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearc
   std::ostream & operator<<(std::ostream &os, const typename RegressionNonLocalFilter<TFeatureImage, TLabelImage, TOutputImage, TSearch, TRegressor, TPreselectionFilter, TRealType>::SegmentationLibraryType &s)
   {
     os<< " [ RegressionLibraryType , size="<<s.size()<<" ]";
+    return os;
   }
   
 template<class TFeatureImage,class TLabelImage, class TOutputImage, class TSearch, class TPatch,class TRegressor,class TPreselectionFilter,class TRealType>
