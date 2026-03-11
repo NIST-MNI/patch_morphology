@@ -211,7 +211,7 @@ namespace itk
       double norm_k=2.0/(norm_max-norm_min);
       ::size_t i;
       PatchKernelIteratorType kernel_it;
-      svm_prob.y[i]=label;
+      svm_prob.y[svm_i]=label;
       
       for( i=0, kernel_it=patchKernelBegin; kernel_it<patchKernelEnd; ++kernel_it, ++i )
       {
