@@ -17,7 +17,9 @@
 #define omp_get_max_threads() 1
 #endif //USE_OPENMP
 #include <cblas.h>
+#ifdef HAVE_LAPACKE
 #include <lapacke.h>
+#endif
 #include "nnls_internal.h"
 #include "nnls.h"
 
@@ -178,10 +180,14 @@ void nnls(REAL *A, REAL *b, REAL *x, int isTransposed, int maxNNLSIters, int max
 	  //Solve unconstrained system
 	  int one = 1;
 	  memcpy(&xp[M2(tid, 0, maxmn)], &b[M2(s, 0, m)], sizeof(REAL) * m);
+#ifdef HAVE_LAPACKE
 #ifndef USE_DOUBLE
 	  LAPACKE_sgels(LAPACK_COL_MAJOR,'N', m, kCols, one, &Apt[M3(tid, 0, 0, n, m)], m, &xp[M2(tid, 0, maxmn)], m );
 #else
 	  LAPACKE_dgels(LAPACK_COL_MAJOR,'N', m, kCols, one, &Apt[M3(tid, 0, 0, n, m)], m, &xp[M2(tid, 0, maxmn)], m );
+#endif
+#else
+	  memset(&xp[M2(tid, 0, maxmn)], 0, sizeof(REAL) * maxmn);
 #endif
 	  //Load solution xp int tx
 	  REAL minTx = HUGE_VAL;
