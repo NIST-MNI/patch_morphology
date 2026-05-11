@@ -6,7 +6,6 @@ INCLUDE_DIRECTORIES(
 
 IF(HAVE_OPENBLAS)
   INCLUDE_DIRECTORIES(
-    ${OpenBLAS_INCLUDE_DIRS}
     3rd_party/nnls/
   )
 ENDIF(HAVE_OPENBLAS)
@@ -50,8 +49,7 @@ TARGET_LINK_LIBRARIES( itk_patch_grading
                 ${ITK_LIBRARIES} )
                 
 IF(HAVE_OPENBLAS)
-  TARGET_LINK_LIBRARIES( itk_patch_grading
-                  ${OpenBLAS_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( itk_patch_grading LAPACKE::LAPACKE )
 ENDIF(HAVE_OPENBLAS)
 
 SET( itk_patch_segmentation_SRC
@@ -69,8 +67,7 @@ TARGET_LINK_LIBRARIES( itk_patch_segmentation
                 ${ITK_LIBRARIES} )
                 
 IF(HAVE_OPENBLAS)
-  TARGET_LINK_LIBRARIES( itk_patch_segmentation
-                  ${OpenBLAS_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( itk_patch_segmentation LAPACKE::LAPACKE )
 ENDIF(HAVE_OPENBLAS)
                 
 
