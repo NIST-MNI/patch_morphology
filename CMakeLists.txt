@@ -1,12 +1,8 @@
 # Vladimir S. FONOV - vladimir.fonov@gmail.com
 #
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 PROJECT (PATCH_MORPHOLOGY)
 ENABLE_TESTING()
-
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-if(COMMAND cmake_policy)
- cmake_policy(SET CMP0003 OLD)
-endif(COMMAND cmake_policy)
 
 IF(NOT MINC_TOOLKIT_BUILD)
   # ITK is optional: probe for it but do not require.
